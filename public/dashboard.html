@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - G-Save Investment</title>
+
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2>G-Save Invest</h2>
+
+        <ul>
+            <li>Dashboard</li>
+            <li>Deposit</li>
+            <li>Invest</li>
+            <li>Withdraw</li>
+            <li onclick="logout()">Logout</li>
+        </ul>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <!-- HEADER -->
+        <div class="header">
+            <h2>Welcome to G-Save Investment</h2>
+        </div>
+
+        <!-- USER INFO -->
+        <div class="card">
+            <p id="userName"></p>
+            <p id="userEmail"></p>
+        </div>
+
+        <!-- BALANCE -->
+        <div class="card balance">
+            <h3>Wallet Balance</h3>
+            <p id="balance">₱1,000,000</p>
+        </div>
+
+<!-- ANALYTICS -->
+<div class="card">
+    <h3>Analytics</h3>
+
+    <p>Total Invested: <span id="totalInvested">0</span> CYT</p>
+    <p>Total Profit: <span id="totalProfit">0</span> CYT</p>
+    <p>Active Investments: <span id="activeCount">0</span></p>
+</div>
+
+<!-- DEPOSIT -->
+<div class="card">
+    <h3>Deposit Funds</h3>
+
+    <input type="number" id="depositAmount" placeholder="Enter amount in ₱">
+
+    <button onclick="deposit()" class="btn">Add Money</button>
+</div>
+
+        <!-- BUY CYT -->
+        <div class="card">
+            <h3>Buy CyberToken (CYT)</h3>
+
+            <input type="number" id="amount" placeholder="Enter amount in ₱">
+
+            <button onclick="buyCYT()" class="btn">Buy CYT</button>
+
+            <p id="cytBalance">CYT Balance: 0</p>
+        </div>
+
+        <!-- INVESTMENT -->
+        <div class="card">
+            <h3>Invest CYT</h3>
+
+            <input type="number" id="investAmount" placeholder="Enter CYT amount">
+
+            <select id="plan">
+                <optgroup label="Weekly Plans">
+                    <option value="7">7 Days (30%)</option>
+                    <option value="14">14 Days (60%)</option>
+                    <option value="21">21 Days (90%)</option>
+                </optgroup>
+
+                <optgroup label="Monthly Plans">
+                    <option value="30">1 Month (95%)</option>
+                    <option value="60">2 Months (150%)</option>
+                    <option value="90">3+ Months (200%)</option>
+                </optgroup>
+            </select>
+
+            <button onclick="invest()" class="btn">Start Investment</button>
+        </div>
+
+        <!-- ACTIVE INVESTMENTS -->
+        <div class="card">
+            <h3>Active Investments</h3>
+            <ul id="investmentList"></ul>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- TRANSACTION HISTORY -->
+<div class="card">
+    <h3>Transaction History</h3>
+    <ul id="historyList"></ul>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+<script src="js/dashboard.js"></script>
+
+</body>
+</html>
