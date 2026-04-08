@@ -14,10 +14,14 @@ app.use("/api/user", userRoutes);
 
 const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://admin:070898@cluster0.igpn8ku.mongodb.net/gsave?retryWrites=true&w=majority";
 
-mongoose.connect(MONGO_URI)
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log("Mongo Error:", err));
+console.log("🔗 Connecting to MongoDB...");
 
+mongoose.connect(MONGO_URI)
+.then(() => console.log("✅ MongoDB Connected Successfully"))
+.catch(err => {
+    console.log("❌ MongoDB Connection Error:");
+    console.log(err);
+});
 // Test route
 app.get("/", (req, res) => {
     res.send("API running...");
