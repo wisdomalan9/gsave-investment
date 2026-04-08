@@ -12,9 +12,13 @@ app.use("/api/user", userRoutes);
 
 // Connect MongoDB
 
-mongoose.connect(process.env.MONGO_URI)
+const mongoose = require("mongoose");
+
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://admin:070898@cluster0.igpn8ku.mongodb.net/gsave?retryWrites=true&w=majority";
+
+mongoose.connect(MONGO_URI)
 .then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
+.catch(err => console.log("Mongo Error:", err));
 
 // Test route
 app.get("/", (req, res) => {
