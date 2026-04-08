@@ -20,7 +20,7 @@ async function syncUser(firebaseUser, retries = 3) {
     try {
         console.log("🚀 Syncing user to backend...");
 
-        const res = await fetch("http://10.68.16.165:5000/api/user/login", {
+        const res = await fetch("https://gsave-investment.onrender.com/api/user/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -55,7 +55,7 @@ async function syncUser(firebaseUser, retries = 3) {
 function saveUserData() {
     if (!currentUser) return;
 
-    fetch("http://10.68.16.165:5000/api/user/update", {
+    fetch("https://gsave-investment.onrender.com/api/user/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
