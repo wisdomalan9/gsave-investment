@@ -6,68 +6,53 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background: #000;
-    color: #fff;
+    font-family: "Segoe UI", sans-serif;
+    background: #f1f6ff;
+    color: #0A2540;
 }
 
 /* NAVBAR */
 .navbar {
-    position: absolute;
+    position: fixed;
     top: 0;
     width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    z-index: 10;
+    background: linear-gradient(135deg, #007DFF, #00C6FF);
+    padding: 12px 16px;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .logo {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 16px;
+    color: #fff;
     font-weight: bold;
 }
 
 .logo img {
-    width: 35px;
-    height: auto;
+    width: 30px;
 }
 
-/* HERO SECTION */
+/* HERO */
 .hero {
+    margin-top: 10px;
+    height: 9vh;
+    min-height: 420px;
     position: relative;
-    width: 100%;
-    height: 100vh;
-    background: #000;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     overflow: hidden;
 }
 
-/* VIDEO (NO ZOOM, CLEAN) */
 .bg-video {
     position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-/* Desktop default */
-.desktop-video {
-    display: block;
-}
-
-.mobile-video {
-    display: none;
-}
-
-/* OVERLAY */
 .overlay {
     position: absolute;
     width: 100%;
@@ -75,34 +60,45 @@ body {
     background: rgba(0,0,0,0.5);
 }
 
-/* CONTENT */
 .hero-content {
     position: relative;
     z-index: 2;
     text-align: center;
-    max-width: 600px;
     padding: 20px;
 }
 
 .hero-content h1 {
-    font-size: 36px;
+    font-size: 26px;
+    color: #fff;
     margin-bottom: 10px;
 }
 
 .hero-content p {
-    font-size: 16px;
+    font-size: 14px;
+    color: #ddd;
     margin-bottom: 20px;
 }
 
-/* BUTTON */
-.btn {
-    padding: 12px 20px;
-    background: #007DFF;
+/* BUTTONS */
+.btn,
+.plan-btn,
+.cta-btn,
+.google-btn {
+    padding: 12px;
     border: none;
-    border-radius: 6px;
+    border-radius: 12px;
+    background: #007DFF;
     color: #fff;
-    font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
+    width: 100%;
+    transition: 0.3s;
+}
+
+.btn:hover,
+.plan-btn:hover,
+.cta-btn:hover {
+    transform: scale(1.03);
 }
 
 /* POPUP */
@@ -114,443 +110,246 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 100;
+    z-index: 200;
 }
 
 .popup-content {
     background: #fff;
-    color: #000;
     padding: 25px;
-    border-radius: 10px;
+    border-radius: 16px;
     text-align: center;
     width: 90%;
     max-width: 350px;
 }
 
 .popup-logo {
-    width: 70px;
+    width: 60px;
     margin-bottom: 10px;
+border-radius: 20px;
 }
 
-/* FEATURES SECTION */
-.features {
-    background: #f5f9ff;
-    color: #000;
-    padding: 60px 20px;
-    text-align: center;
+/* SECTIONS */
+.features,
+.cyt,
+.how,
+.plans,
+.testimonials,
+.howto {
+    background: #fff;
+    border-radius: 20px;
+    margin: 20px;
+    padding: 25px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
+/* TITLE */
 .section-title {
-    font-size: 28px;
-    margin-bottom: 40px;
+    font-size: 20px;
+    margin-bottom: 20px;
 }
 
-/* CONTAINER */
+/* FEATURES */
 .features-container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    grid-template-columns: 1fr;
+    gap: 15px;
 }
 
-/* CARD */
 .feature-card {
-    background: #fff;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    transition: 0.3s;
-}
-
-.feature-card:hover {
-    transform: translateY(-5px);
-}
-
-/* TEXT */
-.feature-card h3 {
-    margin-bottom: 10px;
-    color: #007DFF;
-}
-
-.feature-card p {
-    font-size: 14px;
-    color: #555;
-}
-
-/* 📱 MOBILE */
-@media (max-width: 768px) {
-
-    .features-container {
-        grid-template-columns: 1fr;
-    }
-
-    .section-title {
-        font-size: 22px;
-    }
-
-    .logo img {
-        width: 30px;
-    }
-
-    .logo span {
-        font-size: 14px;
-    }
-
-    .hero-content h1 {
-        font-size: 24px;
-    }
-
-    .hero-content p {
-        font-size: 14px;
-    }
-
-    .btn {
-        width: 100%;
-        font-size: 14px;
-    }
-    
-}
-/* CYBERTOKEN SECTION */
-.cyt {
-    padding: 60px 20px;
-    background: #ffffff;
-    color: #000;
-}
-
-/* CONTAINER */
-.cyt-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 40px;
-    max-width: 1000px;
-    margin: auto;
-}
-
-/* TEXT */
-.cyt-text h2 {
-    font-size: 28px;
-    margin-bottom: 15px;
-}
-
-.cyt-text p {
-    font-size: 15px;
-    margin-bottom: 20px;
-    color: #555;
-}
-
-/* BOX */
-.cyt-box {
-    background: #007DFF;
-    color: #fff;
     padding: 15px;
-    border-radius: 8px;
+    border-radius: 12px;
+    background: #f5f9ff;
 }
 
-.cyt-box h3 {
+.feature-card h3 {
+    color: #007DFF;
     margin-bottom: 5px;
 }
 
-/* VISUAL */
-.cyt-visual {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* CIRCLE */
-.cyt-circle {
-    width: 120px;
-    height: 120px;
-    background: linear-gradient(135deg, #007DFF, #00C6FF);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #fff;
-    font-weight: bold;
-    font-size: 24px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-}
-
-/* 📱 MOBILE */
-@media (max-width: 768px) {
-
-    .cyt-container {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .cyt-circle {
-        width: 90px;
-        height: 90px;
-        font-size: 18px;
-    }
-
-}
-
-/* HOW IT WORKS */
-.how {
-    background: #f5f9ff;
-    padding: 60px 20px;
-    text-align: center;
-}
-
-.how-container {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
-    margin-top: 40px;
-}
-
-/* STEP CARD */
-.how-step {
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-/* NUMBER */
-.step-number {
-    width: 40px;
-    height: 40px;
-    background: #007DFF;
-    color: #fff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 10px;
-    font-weight: bold;
-}
-
-/* TEXT */
-.how-step h3 {
-    margin-bottom: 10px;
-    font-size: 16px;
-}
-
-.how-step p {
-    font-size: 14px;
+.feature-card p {
+    font-size: 13px;
     color: #555;
 }
 
-/* 📱 MOBILE */
-@media (max-width: 768px) {
-
-    .how-container {
-        grid-template-columns: 1fr;
-    }
-
+/* CYT */
+.cyt-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-/* INVESTMENT PLANS */
-.plans {
-    padding: 60px 20px;
-    text-align: center;
-    background: #ffffff;
+.cyt-box {
+    background: linear-gradient(135deg, #007DFF, #00C6FF);
+    color: #fff;
+    padding: 15px;
+    border-radius: 12px;
 }
 
-/* CONTAINER */
-.plans-container {
+.cyt-circle {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #007DFF, #00C6FF);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* HOW */
+.how-container {
+    display: grid;
+    gap: 15px;
+}
+
+.how-step {
+    background: #f5f9ff;
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.step-number {
+    background: #007DFF;
+    color: #fff;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
     display: flex;
     justify-content: center;
-    gap: 30px;
-    flex-wrap: wrap;
-    margin-top: 40px;
+    align-items: center;
+    margin-bottom: 8px;
 }
 
-/* CARD */
+/* PLANS */
+.plans-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
 .plan-card {
     background: #f5f9ff;
-    padding: 25px;
-    border-radius: 12px;
-    width: 280px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 20px;
+    border-radius: 16px;
+    text-align: center;
 }
 
-/* FEATURED */
 .plan-card.featured {
     background: linear-gradient(135deg, #007DFF, #00C6FF);
     color: #fff;
 }
 
-/* RETURN */
 .plan-return {
-    font-size: 28px;
-    font-weight: bold;
-    margin: 15px 0;
+    font-size: 24px;
+    margin: 10px 0;
 }
-
-/* LIST */
-.plan-card ul {
-    list-style: none;
-    padding: 0;
-    margin: 15px 0;
-}
-
-.plan-card ul li {
-    margin: 8px 0;
-    font-size: 14px;
-}
-
-/* BUTTON */
-.plan-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    background: #007DFF;
-    color: #fff;
-    cursor: pointer;
-}
-
-.plan-card.featured .plan-btn {
-    background: #fff;
-    color: #007DFF;
-}
-
-/* 📱 MOBILE */
-@media (max-width: 768px) {
-
-    .plans-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-}
-
 
 /* TESTIMONIALS */
-.testimonials {
-    background: #f5f9ff;
-    padding: 60px 20px;
-    text-align: center;
-}
-
 .testimonials-container {
     display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 40px;
+    flex-direction: column;
+    gap: 15px;
 }
 
-/* VIDEO CARD */
 .video-card {
-    width: 300px;
-    background: #fff;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    background: #f5f9ff;
+    padding: 10px;
+    border-radius: 12px;
 }
 
 .video-card video {
     width: 100%;
-    border-radius: 8px;
-}
-
-.video-card p {
-    font-size: 14px;
-    margin-top: 10px;
-    color: #555;
-}
-
-/* 📱 MOBILE */
-@media (max-width: 768px) {
-
-    .video-card {
-        width: 100%;
-    }
-
-}
-/* HOW-TO SECTION */
-.howto {
-    padding: 60px 20px;
-    text-align: center;
-    background: #ffffff;
-}
-
-.howto-text {
-    max-width: 600px;
-    margin: 10px auto 30px;
-    font-size: 14px;
-    color: #555;
-}
-
-/* VIDEO */
-.howto-video {
-    max-width: 700px;
-    margin: auto;
-}
-
-.howto-video video {
-    width: 100%;
     border-radius: 10px;
 }
 
-/* 📱 MOBILE */
-@media (max-width: 768px) {
-
-    .howto-text {
-        font-size: 13px;
-    }
-
+/* HOWTO */
+.howto-video video {
+    width: 100%;
+    border-radius: 12px;
 }
-/* CTA SECTION */
+
+/* CTA */
 .cta {
     background: linear-gradient(135deg, #007DFF, #00C6FF);
     color: #fff;
     text-align: center;
-    padding: 60px 20px;
-}
-
-.cta h2 {
-    font-size: 28px;
-    margin-bottom: 10px;
-}
-
-.cta p {
-    font-size: 14px;
-    margin-bottom: 20px;
-}
-
-/* BUTTON */
-.cta-btn {
-    padding: 12px 25px;
-    background: #fff;
-    color: #007DFF;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
+    padding: 30px;
+    border-radius: 20px;
+    margin: 20px;
 }
 
 /* FOOTER */
 .footer {
-    background: #0A2540;
-    color: #fff;
     text-align: center;
     padding: 20px;
-    font-size: 13px;
+    font-size: 12px;
 }
 
-/* LOGIN PAGE */
+/* LOGIN */
 .login {
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #f5f9ff;
+border-radius: 20px;
+}
+
+.login-box {
+    background: #fff;
+    padding: 25px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 350px;
+    text-align: center;
+}
+
+/* DASHBOARD */
+.dashboard {
+    padding: 20px;
+}
+
+.wallet {
+    background: linear-gradient(135deg, #007DFF, #00C6FF);
+    color: #fff;
+    padding: 20px;
+    border-radius: 16px;
+}
+
+/* MOBILE IMPROVEMENT */
+@media (min-width: 768px) {
+
+    .features-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .plans-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .plan-card {
+        width: 250px;
+    }
+
+}
+.login {
+    height: 100vh;
+    background: linear-gradient(135deg, #007DFF, #00C6FF);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .login-box {
     background: #fff;
     padding: 30px;
-    border-radius: 10px;
-    text-align: center;
+    border-radius: 20px;
     width: 90%;
     max-width: 350px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
 .login-logo {
@@ -560,30 +359,4 @@ body {
 
 .google-btn {
     margin-top: 20px;
-    padding: 12px;
-    width: 100%;
-    border: none;
-    background: #007DFF;
-    color: #fff;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-/* DASHBOARD */
-.dashboard {
-    padding: 40px 20px;
-    text-align: center;
-}
-
-.user-info {
-    margin-bottom: 20px;
-}
-
-.wallet {
-    background: #007DFF;
-    color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    margin: 20px auto;
-    max-width: 300px;
 }

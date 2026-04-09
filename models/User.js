@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema({
 
     balance: {
         type: Number,
-        default: 1000000
+        default: 0
     },
 
     cyt: {
@@ -28,6 +28,17 @@ const UserSchema = new mongoose.Schema({
     },
 
     history: {
+        type: Array,
+        default: []
+    },
+
+    // 🆕 NEW
+    depositRequests: {
+        type: Array,
+        default: []
+    },
+
+    withdrawRequests: {
         type: Array,
         default: []
     }

@@ -1,4 +1,6 @@
-console.log("🔥 DASHBOARD JS LOADED");
+console.log("🔥 FINAL DASHBOARD VERSION LOADED");
+
+// 🔥 FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyCewm0z-8PA4JIvHR6WZ5QJZ1cTVfRPvXo",
   authDomain: "g-save-investment.firebaseapp.com",
@@ -10,21 +12,17 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
-// GLOBAL STATE
+// 🌍 GLOBAL STATE
 let currentUser = null;
 let history = [];
 let investments = [];
 
-// 🔥 FORCE SYNC WITH RETRY
+// 🔁 SYNC USER
 async function syncUser(firebaseUser, retries = 3) {
     try {
-        console.log("🚀 Syncing user to backend...");
-
         const res = await fetch("https://gsave-investment.onrender.com/api/user/login", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
                 name: firebaseUser.displayName || "User",
                 email: firebaseUser.email
@@ -32,45 +30,38 @@ async function syncUser(firebaseUser, retries = 3) {
         });
 
         const data = await res.json();
-
         if (!data || !data.email) throw new Error("Invalid response");
-
-        console.log("✅ User synced:", data);
 
         return data;
 
     } catch (err) {
-        console.log("❌ Sync failed. Retries left:", retries);
+        console.log("❌ Sync failed:", err);
 
-        if (retries > 0) {
-            return await syncUser(firebaseUser, retries - 1);
-        } else {
-            alert("Server connection failed");
-            return null;
-        }
+        if (retries > 0) return syncUser(firebaseUser, retries - 1);
+
+        alert("Server connection failed");
+        return null;
     }
 }
 
-// SAVE TO DATABASE
+// 💾 SAVE USER DATA
 function saveUserData() {
     if (!currentUser) return;
 
-    fetch("https://gsave-investment.onrender.com/api/user/login", {
+    fetch("https://gsave-investment.onrender.com/api/user/update", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
             email: currentUser.email,
-            balance: Number(window.balance),
-            cyt: Number(window.cyt),
-            investments: investments,
-            history: history
+            balance: Number(window.balance || 0),
+            cyt: Number(window.cyt || 0),
+            investments: investments || [],
+            history: history || []
         })
     });
 }
 
-// 🔐 AUTH (FINAL STABLE VERSION)
+// 🔐 AUTH
 firebase.auth().onAuthStateChanged(async (user) => {
     if (!user) {
         window.location.href = "login.html";
@@ -80,54 +71,51 @@ firebase.auth().onAuthStateChanged(async (user) => {
     document.getElementById("userName").innerText = user.displayName || "User";
     document.getElementById("userEmail").innerText = user.email;
 
-    // 🔥 ALWAYS SYNC USER
     const data = await syncUser(user);
     if (!data) return;
 
     currentUser = data;
 
-    // 🔥 NO NaN EVER
-    window.balance = Number(data.balance ?? 1000000);
+    window.balance = Number(data.balance ?? 0);
     window.cyt = Number(data.cyt ?? 0);
 
     investments = Array.isArray(data.investments) ? data.investments : [];
     history = Array.isArray(data.history) ? data.history : [];
 
+    updateUI();
+});
+
+// 🔄 UI UPDATE
+function updateUI() {
     document.getElementById("balance").innerText = "₱" + window.balance;
     document.getElementById("cytBalance").innerText = "CYT Balance: " + window.cyt;
 
     displayInvestments();
     displayHistory();
     updateAnalytics();
-});
+}
 
-// LOGOUT
+// 🔓 LOGOUT
 function logout() {
     firebase.auth().signOut().then(() => {
         window.location.href = "login.html";
     });
 }
 
-// DEPOSIT
-function deposit() {
+// 📲 REQUEST DEPOSIT (WHATSAPP ONLY)
+function requestDeposit() {
     let amount = parseInt(document.getElementById("depositAmount").value);
 
-    if (!amount || amount <= 0) {
-        alert("Enter valid amount");
+    if (!amount || amount < 2900) {
+        alert("Minimum deposit is ₱2,900");
         return;
     }
 
-    window.balance = Number(window.balance) + amount;
-
-    document.getElementById("balance").innerText = "₱" + window.balance;
-
-    addHistory("Deposit", `Added ₱${amount}`);
-    saveUserData();
-
-    alert("Deposit successful!");
+    let message = `Hello Admin, I want to deposit ₱${amount}\nEmail: ${currentUser.email}`;
+    window.open(`https://wa.me/17828611696?text=${encodeURIComponent(message)}`, "_blank");
 }
 
-// BUY CYT
+// 🪙 BUY CYT
 function buyCYT() {
     let amount = parseInt(document.getElementById("amount").value);
 
@@ -141,85 +129,31 @@ function buyCYT() {
         return;
     }
 
-    let tokens = Math.floor(amount / 2500);
+    let tokens = Math.floor(amount / 500);
 
     if (tokens < 1) {
-        alert("Minimum is ₱2500 for 1 CYT");
+        alert("Minimum is ₱500 for 1 CYT");
         return;
     }
 
-    window.balance = Number(window.balance) - (tokens * 2500);
-    window.cyt = Number(window.cyt) + tokens;
-
-    document.getElementById("balance").innerText = "₱" + window.balance;
-    document.getElementById("cytBalance").innerText = "CYT Balance: " + window.cyt;
+    window.balance -= tokens * 500;
+    window.cyt += tokens;
 
     addHistory("Buy CYT", `Purchased ${tokens} CYT`);
+
     saveUserData();
+    updateUI();
 
-    alert("Successfully purchased " + tokens + " CYT");
+    alert("Purchased " + tokens + " CYT");
 }
 
-// DISPLAY INVESTMENTS
-function displayInvestments() {
-    const list = document.getElementById("investmentList");
-    if (!list) return;
-
-    list.innerHTML = "";
-
-    investments.forEach((inv, index) => {
-
-        let elapsed = Date.now() - inv.startTime;
-        let progress = (elapsed / inv.duration) * 100;
-
-        if (progress >= 100) {
-            progress = 100;
-            inv.status = "completed";
-        }
-
-        let timeLeft = inv.duration - elapsed;
-
-        let days = Math.max(0, Math.floor(timeLeft / (1000 * 60 * 60 * 24)));
-        let hours = Math.max(0, Math.floor((timeLeft / (1000 * 60 * 60)) % 24));
-        let minutes = Math.max(0, Math.floor((timeLeft / (1000 * 60)) % 60));
-
-        let li = document.createElement("li");
-
-        li.innerHTML = `
-            <div class="investment-card">
-                <h4>${inv.amount} CYT</h4>
-                <p>${inv.plan} days plan</p>
-                <p>Profit: ${inv.profit} CYT</p>
-                <p>Status: ${inv.status}</p>
-                <p>Time Left: ${days}d ${hours}h ${minutes}m</p>
-
-                <div class="progress-bar">
-                    <div class="progress" style="width: ${progress}%"></div>
-                </div>
-
-                ${inv.status === "completed"
-                    ? `<button onclick="withdraw(${index})">Request Withdraw</button>`
-                    : ""}
-
-                ${inv.status === "pending"
-                    ? `<button onclick="approveWithdraw(${index})">Approve (Admin)</button>`
-                    : ""}
-            </div>
-        `;
-
-        list.appendChild(li);
-    });
-
-    updateAnalytics();
-}
-
-// INVEST
+// 📈 INVEST
 function invest() {
     let amount = parseInt(document.getElementById("investAmount").value);
     let plan = parseInt(document.getElementById("plan").value);
 
-    if (!amount || amount <= 0) {
-        alert("Enter valid CYT amount");
+    if (!amount || amount < 6) {
+        alert("Minimum investment is 6 CYT (₱2,900)");
         return;
     }
 
@@ -237,31 +171,27 @@ function invest() {
 
     let profit = Math.floor((amount * profitPercent) / 100);
 
-    window.cyt = Number(window.cyt) - amount;
+    window.cyt -= amount;
 
-    let newInvestment = {
+    investments.push({
         amount,
         plan,
         profit,
         status: "active",
         startTime: Date.now(),
-        duration: plan * 24 * 60 * 60 * 1000
-    };
-
-    investments.push(newInvestment);
-
-    document.getElementById("cytBalance").innerText = "CYT Balance: " + window.cyt;
+        duration: plan * 86400000
+    });
 
     addHistory("Investment", `${amount} CYT for ${plan} days`);
-    saveUserData();
 
-    displayInvestments();
+    saveUserData();
+    updateUI();
 
     alert("Investment successful!");
 }
 
-// WITHDRAW
-function withdraw(index) {
+// 💸 REQUEST WITHDRAW
+function requestWithdraw(index) {
     let inv = investments[index];
 
     if (inv.status !== "completed") {
@@ -269,66 +199,87 @@ function withdraw(index) {
         return;
     }
 
-    inv.status = "pending";
-
-    saveUserData();
-    displayInvestments();
-
-    alert("Withdraw request submitted!");
-}
-
-// APPROVE
-function approveWithdraw(index) {
-    let inv = investments[index];
-
-    if (inv.status !== "pending") return;
-
     let totalCYT = inv.amount + inv.profit;
-    let phpValue = totalCYT * 2500;
+    let amountPHP = totalCYT * 500;
 
-    window.balance = Number(window.balance) + phpValue;
+    if (amountPHP < 10000) {
+        alert("Minimum withdrawal is ₱10,000");
+        return;
+    }
 
-    investments.splice(index, 1);
+    let commission = Math.floor(amountPHP * 0.3);
+    let receive = amountPHP - commission;
 
-    document.getElementById("balance").innerText = "₱" + window.balance;
+    let message =
+        `Hello Admin, I want to withdraw ₱${amountPHP}\n` +
+        `Commission (30%): ₱${commission}\n` +
+        `I will receive: ₱${receive}\n` +
+        `Email: ${currentUser.email}`;
 
-    addHistory("Withdraw", `Received ₱${phpValue}`);
-    saveUserData();
-
-    displayInvestments();
-
-    alert("Withdraw approved!");
+    window.open(`https://wa.me/17828611696?text=${encodeURIComponent(message)}`, "_blank");
 }
 
-// HISTORY
+// 📊 INVESTMENTS DISPLAY
+function displayInvestments() {
+    const list = document.getElementById("investmentList");
+    if (!list) return;
+
+    list.innerHTML = "";
+
+    investments.forEach((inv, index) => {
+
+        let elapsed = Date.now() - inv.startTime;
+        let progress = Math.min((elapsed / inv.duration) * 100, 100);
+
+        if (progress === 100) inv.status = "completed";
+
+        let li = document.createElement("li");
+
+        li.innerHTML = `
+            <div class="investment-card">
+                <h4>${inv.amount} CYT</h4>
+                <p>${inv.plan} days</p>
+                <p>Profit: ${inv.profit} CYT</p>
+                <p>Status: ${inv.status}</p>
+
+                <div class="progress-bar">
+                    <div class="progress" style="width:${progress}%"></div>
+                </div>
+
+                ${inv.status === "completed"
+                    ? `<button onclick="requestWithdraw(${index})">Withdraw</button>`
+                    : ""}
+            </div>
+        `;
+
+        list.appendChild(li);
+    });
+}
+
+// 📜 HISTORY
 function addHistory(type, details) {
     history.unshift({
         type,
         details,
         time: new Date().toLocaleString()
     });
-
-    displayHistory();
 }
 
-// DISPLAY HISTORY
+// 📜 DISPLAY HISTORY
 function displayHistory() {
     const list = document.getElementById("historyList");
     if (!list) return;
 
     list.innerHTML = "";
 
-    history.forEach((item) => {
+    history.forEach(item => {
         let li = document.createElement("li");
-        li.innerHTML = `
-            <strong>${item.type}</strong> - ${item.details}
-            <br><small>${item.time}</small>
-        `;
+        li.innerHTML = `<strong>${item.type}</strong> - ${item.details}<br><small>${item.time}</small>`;
         list.appendChild(li);
     });
 }
 
-// ANALYTICS
+// 📊 ANALYTICS
 function updateAnalytics() {
     let totalInvested = 0;
     let totalProfit = 0;
@@ -345,5 +296,5 @@ function updateAnalytics() {
     document.getElementById("activeCount").innerText = activeCount;
 }
 
-// AUTO REFRESH
+// 🔁 AUTO REFRESH
 setInterval(displayInvestments, 1000);

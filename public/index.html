@@ -1,251 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>G-Save Investment</title>
-    <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G-Save Investment</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
+<style>
+.logo img {
+    width: 32px;
+    border-radius: 8px; /* 🔥 smooth look */
+}
+</style>
 
-<!-- 🔒 LICENSE POPUP -->
+<!-- POPUP -->
 <div id="popup" class="popup">
     <div class="popup-content">
-        <img src="images/logo.png" class="popup-logo">
-        <h2>Licensed & Verified</h2>
-        <p>This platform is a demo investment simulator. No real money is involved.</p>
+        <img src="images/ant.png" class="popup-logo">
+        <h2>Welcome to G-Save Investment</h2>
+        <p>
+            This platform is designed to help you understand how investment systems work in a simple and practical way. 
+            You will be able to deposit funds, convert them into a digital token (CYT), invest for a specific number of days, 
+            and see how profits are calculated over time.
+        </p>
         <button onclick="closePopup()">Continue</button>
     </div>
 </div>
 
-<!-- 🔝 NAVBAR -->
+<!-- NAVBAR -->
 <header class="navbar">
     <div class="logo">
-        <img src="images/logo.png">
+        <img src="images/ant.png" class="logo-img">
         <span>G-Save Investment</span>
     </div>
 </header>
 
+<!-- HERO -->
 <section class="hero">
 
-    <video autoplay muted loop playsinline class="bg-video">
-        <source src="videos/hero-bg.mp4" type="video/mp4">
-    </video>
+<video autoplay muted loop class="bg-video">
+    <source src="videos/hero-bg.mp4">
+</video>
 
-    <div class="overlay"></div>
+<div class="overlay"></div>
 
-    <div class="hero-content">
-        <h1>Start Your Investment Journey</h1>
-        <p>Practice saving and investing with CyberToken (CYT)</p>
-<a href="/login">
-    <button class="btn">Get Started</button>
-    </a>
-    </div>
-
-</section>
-
-<!-- ⭐ FEATURES SECTION -->
-<section class="features">
-
-    <h2 class="section-title">Why Choose G-Save Investment</h2>
-
-    <div class="features-container">
-
-        <div class="feature-card">
-            <h3>Secure System</h3>
-            <p>Your account and data are protected with modern technology.</p>
-        </div>
-
-        <div class="feature-card">
-            <h3>Easy to Use</h3>
-            <p>Simple dashboard designed for beginners and professionals.</p>
-        </div>
-
-        <div class="feature-card">
-            <h3>Virtual Investment</h3>
-            <p>Practice investing using CyberToken with no real money risk.</p>
-        </div>
-
-        <div class="feature-card">
-            <h3>Fast Simulation</h3>
-            <p>See your investment growth instantly in our demo environment.</p>
-        </div>
-
-    </div>
-
-</section>
-
-<!-- 🪙 CYBERTOKEN SECTION -->
-<section class="cyt">
-
-    <div class="cyt-container">
-
-        <div class="cyt-text">
-            <h2>What is CyberToken (CYT)?</h2>
-            <p>
-                CyberToken (CYT) is the virtual currency used in G-Save Investment.
-                It allows users to simulate savings and investment activities in a safe environment.
-            </p>
-
-            <div class="cyt-box">
-                <h3>1 CYT = ₦2,500</h3>
-                <p>Convert your demo balance into CYT and start investing.</p>
-            </div>
-        </div>
-
-        <div class="cyt-visual">
-            <div class="cyt-circle">CYT</div>
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ⚙️ HOW IT WORKS -->
-<section class="how">
-
-    <h2 class="section-title">How It Works</h2>
-
-    <div class="how-container">
-
-        <div class="how-step">
-            <div class="step-number">1</div>
-            <h3>Create Account</h3>
-            <p>Sign in quickly using your Google account.</p>
-        </div>
-
-        <div class="how-step">
-            <div class="step-number">2</div>
-            <h3>Get Demo Balance</h3>
-            <p>Receive virtual funds to start your journey.</p>
-        </div>
-
-        <div class="how-step">
-            <div class="step-number">3</div>
-            <h3>Buy CYT</h3>
-            <p>Convert your demo balance into CyberToken.</p>
-        </div>
-
-        <div class="how-step">
-            <div class="step-number">4</div>
-            <h3>Invest</h3>
-            <p>Choose a plan and simulate investment growth.</p>
-        </div>
-
-        <div class="how-step">
-            <div class="step-number">5</div>
-            <h3>Withdraw</h3>
-            <p>Convert CYT back to demo balance anytime.</p>
-        </div>
-
-    </div>
-
-</section>
-
-<!-- 💰 INVESTMENT PLANS -->
-<section class="plans">
-
-    <h2 class="section-title">Investment Plans</h2>
-
-    <div class="plans-container">
-
-        <!-- PLAN 1 -->
-        <div class="plan-card">
-            <h3>6 Months Plan</h3>
-            <p class="plan-return">+40% Growth</p>
-
-            <ul>
-                <li>Duration: 6 Months</li>
-                <li>Minimum: 1 CYT</li>
-                <li>Simulation Only</li>
-            </ul>
-
-            <button class="plan-btn">Start Plan</button>
-        </div>
-
-        <!-- PLAN 2 -->
-        <div class="plan-card featured">
-            <h3>12 Months Plan</h3>
-            <p class="plan-return">+70% Growth</p>
-
-            <ul>
-                <li>Duration: 12 Months</li>
-                <li>Minimum: 1 CYT</li>
-                <li>Simulation Only</li>
-            </ul>
-
-            <button class="plan-btn">Start Plan</button>
-        </div>
-
-    </div>
-
-</section>
-
-<!-- 🎥 TESTIMONIALS -->
-<section class="testimonials">
-
-    <h2 class="section-title">What Users Say</h2>
-
-    <div class="testimonials-container">
-
-        <div class="video-card">
-            <video controls>
-<source src="videos/hero-bg.mp4">
-            </video>
-            <p>“This platform helped me understand investing better.”</p>
-        </div>
-
-        <div class="video-card">
-            <video controls>
-<source src="videos/hero-bg.mp4">
-            </video>
-            <p>“The simulation makes everything easy to learn.”</p>
-        </div>
-
-        <div class="video-card">
-            <video controls>
-<source src="videos/hero-bg.mp4">
-            </video>
-            <p>“Clean interface and very beginner friendly.”</p>
-        </div>
-
-    </div>
-
-</section>
-
-<!-- 🎓 HOW TO USE -->
-<section class="howto">
-
-    <h2 class="section-title">Learn How It Works</h2>
-    <p class="howto-text">
-        Watch this quick guide to understand how to use G-Save Investment and start your simulation journey.
+<div class="hero-content">
+    <h1>Learn and Practice Investment Step by Step</h1>
+    <p>
+        G-Save Investment allows you to understand how digital investment works from beginning to end. 
+        You will start with a wallet balance, convert it into CyberToken (CYT), choose an investment plan, 
+        and track your profits until completion.
     </p>
 
-    <div class="howto-video">
-        <video controls>
-            <source src="videos/hero-bg.mp4" type="video/mp4">
-        </video>
-    </div>
+    <a href="login.html">
+        <button class="btn">Get Started</button>
+    </a>
+</div>
 
 </section>
 
-<!-- 🚀 CALL TO ACTION -->
+<!-- FEATURES -->
+<section class="features">
+
+<h2 class="section-title">What You Can Do on This Platform</h2>
+
+<div class="features-container">
+
+<div class="feature-card">
+<h3>Manage Your Wallet</h3>
+<p>
+Every user has a wallet where money is stored. You can deposit funds into your wallet and use that balance 
+to perform different activities inside the system.
+</p>
+</div>
+
+<div class="feature-card">
+<h3>Convert to CYT</h3>
+<p>
+Before you can invest, you need to convert your wallet balance into CyberToken (CYT). 
+This is the digital token used for all investments on this platform.
+</p>
+</div>
+
+<div class="feature-card">
+<h3>Invest for a Duration</h3>
+<p>
+You can choose how long you want your investment to run — from 7 days to 60 days. 
+Each plan has a different return based on the duration you select.
+</p>
+</div>
+
+<div class="feature-card">
+<h3>Track Your Progress</h3>
+<p>
+Once you invest, your progress is tracked in real-time. You can see how much time is left and when your 
+investment will be completed.
+</p>
+</div>
+
+</div>
+
+</section>
+
+<!-- CYT -->
+<section class="cyt">
+
+<div class="cyt-container">
+
+<div class="cyt-text">
+<h2>What is CyberToken (CYT)?</h2>
+
+<p>
+CyberToken (CYT) is the main unit used for investment in this system. Instead of investing directly with your wallet balance, 
+you first convert your money into CYT and then use it for investment.
+</p>
+
+<div class="cyt-box">
+<h3>1 CYT = ₱500</h3>
+<p>
+For example, if you have ₱5,000, you can convert it into 10 CYT. 
+You can then use those 10 CYT to start an investment plan.
+</p>
+</div>
+
+</div>
+
+<div class="cyt-visual">
+<div class="cyt-circle">CYT</div>
+</div>
+
+</div>
+
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+
+<h2 class="section-title">How the System Works</h2>
+
+<div class="how-container">
+
+<div class="how-step">
+<div class="step-number">1</div>
+<h3>Login</h3>
+<p>
+Sign in using your Google account to access your personal dashboard.
+</p>
+</div>
+
+<div class="how-step">
+<div class="step-number">2</div>
+<h3>Deposit Funds</h3>
+<p>
+Add money to your wallet. This is the balance you will use for all your activities.
+</p>
+</div>
+
+<div class="how-step">
+<div class="step-number">3</div>
+<h3>Buy CYT</h3>
+<p>
+Convert your wallet balance into CYT at a fixed rate of ₱500 per token.
+</p>
+</div>
+
+<div class="how-step">
+<div class="step-number">4</div>
+<h3>Start Investment</h3>
+<p>
+Choose a plan (7–60 days) and invest your CYT. Your investment will start immediately.
+</p>
+</div>
+
+<div class="how-step">
+<div class="step-number">5</div>
+<h3>Earn Profit</h3>
+<p>
+Once the investment period is completed, your profit will be added and you can withdraw it.
+</p>
+</div>
+
+</div>
+
+</section>
+
+<!-- PLANS -->
+<section class="plans">
+
+<h2 class="section-title">Available Investment Plans</h2>
+
+<div class="plans-container">
+
+<div class="plan-card">
+<h3>7 Days Plan</h3>
+<p class="plan-return">30% Profit</p>
+<p>This is a short-term plan designed for quick returns.</p>
+<button onclick="location.href='login.html'">Start</button>
+</div>
+
+<div class="plan-card">
+<h3>14 Days Plan</h3>
+<p class="plan-return">60% Profit</p>
+<p>This plan gives a higher return over a slightly longer period.</p>
+<button onclick="location.href='login.html'">Start</button>
+</div>
+
+<div class="plan-card">
+<h3>21 Days Plan</h3>
+<p class="plan-return">90% Profit</p>
+<p>A balanced plan between time and profit.</p>
+<button onclick="location.href='login.html'">Start</button>
+</div>
+
+<div class="plan-card featured">
+<h3>30 Days Plan</h3>
+<p class="plan-return">95% Profit</p>
+<p>This is one of the most stable and commonly used plans.</p>
+<button onclick="location.href='login.html'">Start</button>
+</div>
+
+<div class="plan-card">
+<h3>60 Days Plan</h3>
+<p class="plan-return">150% Profit</p>
+<p>A long-term plan with the highest return.</p>
+<button onclick="location.href='login.html'">Start</button>
+</div>
+
+</div>
+
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+
+<h2 class="section-title">User Experience</h2>
+
+<div class="testimonials-container">
+
+<div class="video-card">
+<video controls>
+<source src="videos/hero-bg.mp4">
+</video>
+<p>“I now understand how investment timing works.”</p>
+</div>
+
+<div class="video-card">
+<video controls>
+<source src="videos/hero-bg.mp4">
+</video>
+<p>“Very easy to follow even for beginners.”</p>
+</div>
+
+<div class="video-card">
+<video controls>
+<source src="videos/hero-bg.mp4">
+</video>
+<p>“The system makes everything clear step by step.”</p>
+</div>
+
+</div>
+
+</section>
+
+<!-- CTA -->
 <section class="cta">
 
-    <h2>Ready to Start Your Journey?</h2>
-    <p>Join G-Save Investment and begin your virtual investment experience today.</p>
+<h2>Start Your Investment Journey</h2>
+<p>
+Create your account, explore the dashboard, and begin learning how digital investments work in a structured way.
+</p>
 
-    <button class="cta-btn">Get Started</button>
+<button onclick="location.href='login.html'" class="cta-btn">Get Started</button>
 
 </section>
 
-<!-- 🔻 FOOTER -->
+<!-- FOOTER -->
 <footer class="footer">
-
-    <p>© 2026 G-Save Investment. All rights reserved.</p>
-    <p>This platform is a demo investment simulator. No real money is involved.</p>
-
+<p>© 2026 G-Save Investment</p>
 </footer>
 
 <script src="js/script.js"></script>

@@ -65,4 +65,145 @@ router.post("/update", async (req, res) => {
     }
 });
 
+router.post("/request-deposit", async (req, res) => {
+    try {
+        const { email, amount } = req.body;
+
+        const user = await User.findOne({ email });
+
+        user.depositRequests.push({
+            amount: Number(amount),
+            status: "pending",
+            date: new Date()
+        });
+
+        await user.save();
+
+        res.json({ message: "Deposit request sent" });
+
+    } catch (err) {
+        res.status(500).json({ error: "Failed" });
+    }
+});
+
+router.post("/request-withdraw", async (req, res) => {
+    try {
+        const { email, amount } = req.body;
+
+        const user = await User.findOne({ email });
+
+        user.withdrawRequests.push({
+            amount: Number(amount),
+            status: "pending",
+            date: new Date()
+        });
+
+        await user.save();
+
+        res.json({ message: "Withdraw request sent" });
+
+    } catch (err) {
+        res.status(500).json({ error: "Failed" });
+    }
+});
+
+router.post("/approve-deposit", async (req, res) => {
+    try {
+        const { email, index } = req.body;
+
+        const user = await User.findOne({ email });
+
+        let request = user.depositRequests[index];
+
+        if (!request || request.status !== "pending") {
+            return res.status(400).json({ error: "Invalid request" });
+        }
+
+        request.status = "approved";
+
+        user.balance += request.amount;
+
+        user.history.unshift({
+            type: "Deposit Approved",
+            details: `₱${request.amount} added`,
+            time: new Date().toLocaleString()
+        });
+
+        await user.save();
+
+        res.json({ message: "Deposit approved" });
+
+    } catch (err) {
+        res.status(500).json({ error: "Error" });
+    }
+});
+
+router.post("/reject-deposit", async (req, res) => {
+    try {
+        const { email, index } = req.body;
+
+        const user = await User.findOne({ email });
+
+        user.depositRequests[index].status = "rejected";
+
+        await user.save();
+
+        res.json({ message: "Rejected" });
+
+    } catch (err) {
+        res.status(500).json({ error: "Error" });
+    }
+});
+
+router.post("/approve-withdraw", async (req, res) => {
+    try {
+        const { email, index } = req.body;
+
+        const user = await User.findOne({ email });
+
+        let request = user.withdrawRequests[index];
+
+        if (!request || request.status !== "pending") {
+            return res.status(400).json({ error: "Invalid request" });
+        }
+
+        if (user.balance < request.amount) {
+            return res.status(400).json({ error: "Insufficient balance" });
+        }
+
+        request.status = "approved";
+
+        user.balance -= request.amount;
+
+        user.history.unshift({
+            type: "Withdraw Approved",
+            details: `₱${request.amount} sent`,
+            time: new Date().toLocaleString()
+        });
+
+        await user.save();
+
+        res.json({ message: "Withdraw approved" });
+
+    } catch (err) {
+        res.status(500).json({ error: "Error" });
+    }
+});
+
+router.post("/reject-withdraw", async (req, res) => {
+    try {
+        const { email, index } = req.body;
+
+        const user = await User.findOne({ email });
+
+        user.withdrawRequests[index].status = "rejected";
+
+        await user.save();
+
+        res.json({ message: "Rejected" });
+
+    } catch (err) {
+        res.status(500).json({ error: "Error" });
+    }
+});
 module.exports = router;
