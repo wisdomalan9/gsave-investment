@@ -13,7 +13,7 @@ router.post("/login", async (req, res) => {
             user = new User({
                 name: name || "User",
                 email,
-                balance: 1000000,
+                balance: 0,
                 cyt: 0,
                 investments: [],
                 history: []
@@ -26,14 +26,17 @@ router.post("/login", async (req, res) => {
         }
 
         // 🔥 ALWAYS RETURN SAFE DATA
-        res.json({
-            name: user.name || "User",
-            email: user.email,
-            balance: Number(user.balance ?? 1000000),
-            cyt: Number(user.cyt ?? 0),
-            investments: Array.isArray(user.investments) ? user.investments : [],
-            history: Array.isArray(user.history) ? user.history : []
-        });
+res.json({
+    name: user.name || "User",
+    email: user.email,
+    balance: Number(user.balance ?? 0),
+    cyt: Number(user.cyt ?? 0),
+    investments: Array.isArray(user.investments) ? user.investments : [],
+    history: Array.isArray(user.history) ? user.history : [],
+
+    depositRequests: Array.isArray(user.depositRequests) ? user.depositRequests : [],
+    withdrawRequests: Array.isArray(user.withdrawRequests) ? user.withdrawRequests : []
+});
 
     } catch (err) {
         console.log("❌ LOGIN ERROR:", err);
@@ -70,7 +73,9 @@ router.post("/request-deposit", async (req, res) => {
         const { email, amount } = req.body;
 
         const user = await User.findOne({ email });
-
+if (!user) {
+    return res.status(404).json({ error: "User not found" });
+}
         user.depositRequests.push({
             amount: Number(amount),
             status: "pending",
@@ -113,7 +118,7 @@ router.post("/approve-deposit", async (req, res) => {
 
         const user = await User.findOne({ email });
 
-        let request = user.depositRequests[index];
+        if (!user.depositRequests[index]) {    return res.status(400).json({ error: "Invalid request" });}let request = user.depositRequests[index];
 
         if (!request || request.status !== "pending") {
             return res.status(400).json({ error: "Invalid request" });
@@ -121,7 +126,7 @@ router.post("/approve-deposit", async (req, res) => {
 
         request.status = "approved";
 
-        user.balance += request.amount;
+        user.balance = Number(user.balance || 0) + Number(request.amount || 0);
 
         user.history.unshift({
             type: "Deposit Approved",
@@ -161,7 +166,7 @@ router.post("/approve-withdraw", async (req, res) => {
 
         const user = await User.findOne({ email });
 
-        let request = user.withdrawRequests[index];
+        if (!user.withdrawRequests[index]) {    return res.status(400).json({ error: "Invalid request" });}let request = user.withdrawRequests[index];
 
         if (!request || request.status !== "pending") {
             return res.status(400).json({ error: "Invalid request" });
@@ -173,7 +178,7 @@ router.post("/approve-withdraw", async (req, res) => {
 
         request.status = "approved";
 
-        user.balance -= request.amount;
+        user.balance = Number(user.balance || 0) - Number(request.amount || 0);
 
         user.history.unshift({
             type: "Withdraw Approved",
