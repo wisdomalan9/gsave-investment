@@ -111,7 +111,15 @@ function requestDeposit() {
         return;
     }
 
-    let message =`G-SAVE INVESTMENTDeposit RequestAmount: ₱${amount}User Email: ${currentUser.email}Please confirm once received.`;
+let message =
+`G-SAVE INVESTMENT
+
+Deposit Request
+Amount: ₱${amount}
+
+User Email: ${currentUser.email}
+
+Please confirm once received.`;
     window.open(`https://wa.me/17828611696?text=${encodeURIComponent(message)}`, "_blank");
 }
 
@@ -247,7 +255,7 @@ function displayInvestments() {
                 </div>
 
                 ${inv.status === "completed"
-                    ? `<button onclick="requestWithdraw(${index})">Withdraw</button>`
+                    ? `<button onclick="requestWithdraw(${index})" class="btn">Request Withdrawal</button>`
                     : ""}
             </div>
         `;
@@ -292,8 +300,8 @@ function updateAnalytics() {
     });
 
     document.getElementById("totalInvested").innerText = totalInvested;
-    document.getElementById("totalProfit").innerText = totalProfit;
-    document.getElementById("activeCount").innerText = activeCount;
+document.getElementById("totalProfit").innerText = totalProfit;
+document.getElementById("activeCount").innerText = activeCount;
 }
 
 function refreshAccount() {
