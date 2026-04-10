@@ -103,8 +103,6 @@ if (!user) {
     return res.status(404).json({ error: "User not found" });
 }
 
-user.withdrawRequests.push({
-
         user.withdrawRequests.push({
             amount: Number(amount),
             status: "pending",
