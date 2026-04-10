@@ -111,7 +111,7 @@ function requestDeposit() {
         return;
     }
 
-    let message = `Hello Admin, I want to deposit ₱${amount}\nEmail: ${currentUser.email}`;
+    let message =`G-SAVE INVESTMENTDeposit RequestAmount: ₱${amount}User Email: ${currentUser.email}Please confirm once received.`;
     window.open(`https://wa.me/17828611696?text=${encodeURIComponent(message)}`, "_blank");
 }
 
@@ -294,6 +294,24 @@ function updateAnalytics() {
     document.getElementById("totalInvested").innerText = totalInvested;
     document.getElementById("totalProfit").innerText = totalProfit;
     document.getElementById("activeCount").innerText = activeCount;
+}
+
+function refreshAccount() {
+    firebase.auth().onAuthStateChanged(async (user) => {
+        if (!user) return;
+
+        const data = await syncUser(user);
+        if (!data) return;
+
+        window.balance = Number(data.balance || 0);
+        window.cyt = Number(data.cyt || 0);
+        investments = data.investments || [];
+        history = data.history || [];
+
+        updateUI();
+
+        alert("Account updated!");
+    });
 }
 
 // 🔁 AUTO REFRESH

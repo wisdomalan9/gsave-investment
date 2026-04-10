@@ -17,14 +17,13 @@
         <h2>G-Save</h2>
 
         <ul>
-            <li>Dashboard</li>
-            <li>Deposit</li>
-            <li>Invest</li>
-            <li>Withdraw</li>
-            <li onclick="logout()">Logout</li>
+<li onclick="window.scrollTo(0,0)">Dashboard</li>
+<li onclick="document.getElementById('depositSection').scrollIntoView()">Deposit</li>
+<li onclick="document.getElementById('investSection').scrollIntoView()">Invest</li>
+<li onclick="document.getElementById('investmentList').scrollIntoView()">Withdraw</li>
+<li onclick="logout()">Logout</li>
         </ul>
-    </div>
-
+</div>
     <!-- MAIN -->
     <div class="main">
 
@@ -42,6 +41,7 @@
             <h3>Wallet Balance</h3>
             <h1 id="balance">₱0</h1>
             <p id="cytBalance">CYT Balance: 0</p>
+<button onclick="refreshAccount()" class="btn">Refresh Account</button>
         </div>
 
         <!-- ANALYTICS -->
@@ -63,7 +63,7 @@
         </div>
 
         <!-- DEPOSIT -->
-        <div class="card">
+<div class="card" id="depositSection">
             <h3>Deposit Funds</h3>
 
             <input type="number" id="depositAmount" placeholder="Enter amount in ₱">
@@ -79,11 +79,10 @@
 
             <button onclick="buyCYT()" class="btn">Buy CYT</button>
 
-            <p id="cytBalance">CYT Balance: 0</p>
         </div>
 
         <!-- INVEST -->
-        <div class="card">
+        <div class="card" id="investSection">
             <h3>Invest CYT</h3>
 
             <input type="number" id="investAmount" placeholder="Enter CYT amount">
