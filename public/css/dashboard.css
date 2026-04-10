@@ -1,119 +1,99 @@
-/* LAYOUT */
-.dashboard-container {
-    display: flex;
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
 }
 
-/* SIDEBAR */
-.sidebar {
-    width: 200px;
-    background: #007DFF;
-    color: #fff;
-    padding: 20px;
-    min-height: 100vh;
-}
-
-.sidebar h2 {
-    margin-bottom: 20px;
-}
-
-.sidebar ul {
-    list-style: none;
-}
-
-.sidebar li {
-    margin: 10px 0;
-    cursor: pointer;
-}
-
-/* MAIN */
-.main {
-    flex: 1;
-    padding: 20px;
-    background: #f1f6ff;
+.app {
+    padding: 15px;
 }
 
 /* HEADER */
-.header {
+.top {
     margin-bottom: 20px;
 }
 
-/* CARDS */
-.card {
-    background: #fff;
-    padding: 15px;
-    border-radius: 16px;
-    margin-bottom: 15px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-}
-
 /* WALLET */
-.wallet {
-    background: linear-gradient(135deg, #007DFF, #00C6FF);
-    color: #fff;
+.wallet-card {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
 }
 
-/* ANALYTICS */
-.analytics {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.analytics .small {
-    flex: 1;
-    text-align: center;
-}
-
-/* INPUTS */
-input, select {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 10px;
-    border: 1px solid #ddd;
+.wallet-card h1 {
+    font-size: 28px;
 }
 
 /* BUTTON */
 .btn {
-    width: 100%;
-    padding: 12px;
+    background: black;
+    color: white;
+    padding: 10px;
     border: none;
-    background: #007DFF;
-    color: #fff;
-    border-radius: 12px;
+    border-radius: 10px;
+    margin-top: 10px;
 }
 
-/* LISTS */
+/* ACTIONS */
+.actions {
+    display: grid;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.action-card {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 8px;
+    border: none;
+}
+
+/* STATS */
+.stats {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.stats .card {
+    flex: 1;
+    background: #1e293b;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* SECTIONS */
+.section {
+    margin-bottom: 20px;
+}
+
 ul {
     list-style: none;
     padding: 0;
 }
 
 li {
-    background: #f5f9ff;
+    background: #1e293b;
     padding: 10px;
+    margin-bottom: 10px;
     border-radius: 10px;
-    margin-bottom: 8px;
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
-
-    .dashboard-container {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        width: 100%;
-        display: flex;
-        justify-content: space-around;
-    }
-
-    .main {
-        padding: 10px;
-    }
-
-    .analytics {
-        flex-direction: column;
-    }
+/* LOGOUT */
+.logout {
+    width: 100%;
+    background: red;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
 }
