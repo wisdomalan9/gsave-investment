@@ -76,6 +76,7 @@ router.post("/request-deposit", async (req, res) => {
 if (!user) {
     return res.status(404).json({ error: "User not found" });
 }
+
         user.depositRequests.push({
             amount: Number(amount),
             status: "pending",
@@ -92,10 +93,17 @@ if (!user) {
 });
 
 router.post("/request-withdraw", async (req, res) => {
+
     try {
         const { email, amount } = req.body;
 
-        const user = await User.findOne({ email });
+const user = await User.findOne({ email });
+
+if (!user) {
+    return res.status(404).json({ error: "User not found" });
+}
+
+user.withdrawRequests.push({
 
         user.withdrawRequests.push({
             amount: Number(amount),
@@ -117,8 +125,15 @@ router.post("/approve-deposit", async (req, res) => {
         const { email, index } = req.body;
 
         const user = await User.findOne({ email });
+if (!user) {
+    return res.status(404).json({ error: "User not found" });
+}
 
-        if (!user.depositRequests[index]) {    return res.status(400).json({ error: "Invalid request" });}let request = user.depositRequests[index];
+if (!user.depositRequests[index]) {
+    return res.status(400).json({ error: "Invalid request" });
+}
+
+let request = user.depositRequests[index];
 
         if (!request || request.status !== "pending") {
             return res.status(400).json({ error: "Invalid request" });
@@ -148,6 +163,13 @@ router.post("/reject-deposit", async (req, res) => {
         const { email, index } = req.body;
 
         const user = await User.findOne({ email });
+if (!user) {
+    return res.status(404).json({ error: "User not found" });
+}
+
+if (!user.depositRequests[index]) {
+    return res.status(400).json({ error: "Invalid request" });
+}
 
         user.depositRequests[index].status = "rejected";
 
@@ -165,8 +187,15 @@ router.post("/approve-withdraw", async (req, res) => {
         const { email, index } = req.body;
 
         const user = await User.findOne({ email });
+if (!user) {
+    return res.status(404).json({ error: "User not found" });
+}
 
-        if (!user.withdrawRequests[index]) {    return res.status(400).json({ error: "Invalid request" });}let request = user.withdrawRequests[index];
+if (!user.withdrawRequests[index]) {
+    return res.status(400).json({ error: "Invalid request" });
+}
+
+let request = user.withdrawRequests[index];
 
         if (!request || request.status !== "pending") {
             return res.status(400).json({ error: "Invalid request" });
@@ -200,6 +229,14 @@ router.post("/reject-withdraw", async (req, res) => {
         const { email, index } = req.body;
 
         const user = await User.findOne({ email });
+
+if (!user) {
+    return res.status(404).json({ error: "User not found" });
+}
+
+if (!user.withdrawRequests[index]) {
+    return res.status(400).json({ error: "Invalid request" });
+}
 
         user.withdrawRequests[index].status = "rejected";
 
