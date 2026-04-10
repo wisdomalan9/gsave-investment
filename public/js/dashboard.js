@@ -160,7 +160,7 @@ function invest() {
     let amount = parseInt(document.getElementById("investAmount").value);
     let plan = parseInt(document.getElementById("plan").value);
 
-    if (!amount || amount < 6) {
+    if (!amount || amount < 1) {
         alert("Minimum investment is 6 CYT (₱2,900)");
         return;
     }
@@ -170,12 +170,12 @@ function invest() {
         return;
     }
 
-    let profitPercent =
-        plan === 7 ? 30 :
-        plan === 14 ? 60 :
-        plan === 21 ? 90 :
-        plan === 30 ? 95 :
-        plan === 60 ? 150 : 200;
+let profitPercent =
+    plan === 3 ? 50 :
+    plan === 7 ? 70 :
+    plan === 9 ? 90 :
+    plan === 14 ? 120 :
+    plan === 30 ? 300 : 0;
 
     let profit = Math.floor((amount * profitPercent) / 100);
 
