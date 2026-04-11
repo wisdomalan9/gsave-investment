@@ -160,7 +160,7 @@ function invest() {
     let amount = parseInt(document.getElementById("investAmount").value);
     let plan = parseInt(document.getElementById("plan").value);
 
-    if (!amount || amount < 1) {
+    if (!amount || amount < 6) {
         alert("Minimum investment is 6 CYT (₱2,900)");
         return;
     }
@@ -244,9 +244,7 @@ if (!inv.startTime || !inv.duration) {
 
 let elapsed = now - inv.startTime;
 elapsed = elapsed * 5;
-let remaining = inv.duration - elapsed;
-        let progress = Math.min((elapsed / inv.duration) * 100, 100);
-
+let progress = Math.min((elapsed / inv.duration) * 100, 100) || 0;
         // ✅ MARK COMPLETE
         if (progress >= 100) {
             inv.status = "completed";
