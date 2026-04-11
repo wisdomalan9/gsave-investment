@@ -352,9 +352,6 @@ function refreshAccount() {
 }
 
 // 🔁 AUTO REFRESH
-function animate() {
+setInterval(() => {
     displayInvestments();
-    requestAnimationFrame(animate);
-}
-
-animate();
+}, 1000); // updates every 1 second
