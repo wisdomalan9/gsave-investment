@@ -17,6 +17,25 @@ let currentUser = null;
 let history = [];
 let investments = [];
 
+function showPopup(message, color = "#00c853") {
+    const popup = document.getElementById("popup");
+    if (!popup) return;
+
+    // reset first
+    popup.classList.remove("show");
+
+    popup.innerText = message;
+    popup.style.background = color;
+
+    setTimeout(() => {
+        popup.classList.add("show");
+    }, 10);
+
+    setTimeout(() => {
+        popup.classList.remove("show");
+    }, 3000);
+}
+
 // 🔁 SYNC USER
 async function syncUser(firebaseUser, retries = 3) {
     try {
@@ -39,7 +58,7 @@ async function syncUser(firebaseUser, retries = 3) {
 
         if (retries > 0) return syncUser(firebaseUser, retries - 1);
 
-        alert("Server connection failed");
+        showPopup("Server connection failed", "#ff3d00");
         return null;
     }
 }
@@ -87,7 +106,7 @@ firebase.auth().onAuthStateChanged(async (user) => {
 
 // 🔄 UI UPDATE
 function updateUI() {
-    document.getElementById("balance").innerText = "₱" + window.balance;
+    document.getElementById("balance").innerText = "₱" + window.balance.toLocaleString();
     document.getElementById("cytBalance").innerText = "CYT Balance: " + window.cyt;
 
     displayInvestments();
@@ -108,7 +127,7 @@ function requestDeposit() {
     let amount = parseInt(document.getElementById("depositAmount").value);
 
     if (!amount || amount < 2900) {
-        alert("Minimum deposit is ₱2,900");
+        showPopup("Minimum deposit is ₱2,900", "#ff3d00");
         return;
     }
 
@@ -129,19 +148,19 @@ function buyCYT() {
     let amount = parseInt(document.getElementById("amount").value);
 
     if (!amount || amount <= 0) {
-        alert("Enter valid amount");
+        showPopup("Enter valid amount", "#ff3d00");
         return;
     }
 
     if (amount > window.balance) {
-        alert("Insufficient balance");
+        showPopup("Insufficient balance", "#ff3d00");
         return;
     }
 
     let tokens = Math.floor(amount / 500);
 
     if (tokens < 1) {
-        alert("Minimum is ₱500 for 1 CYT");
+        showPopup("Minimum is ₱500 for 1 CYT", "#ff3d00");
         return;
     }
 
@@ -153,7 +172,7 @@ function buyCYT() {
     saveUserData();
     updateUI();
 
-    alert("Purchased " + tokens + " CYT");
+    showPopup("Purchased " + tokens + " CYT");
 }
 
 // 📈 INVEST
@@ -162,12 +181,12 @@ function invest() {
     let plan = parseInt(document.getElementById("plan").value);
 
     if (!amount || amount < 6) {
-        alert("Minimum investment is 6 CYT (₱2,900)");
+        showPopup("Minimum investment is 6 CYT (₱2,900)", "#ff3d00");
         return;
     }
 
     if (amount > window.cyt) {
-        alert("Not enough CYT");
+        showPopup("Not enough CYT", "#ff3d00");
         return;
     }
 
@@ -199,7 +218,7 @@ investments.push({
     saveUserData();
     updateUI();
 
-    alert("Investment successful!");
+    showPopup("Investment successful!");
 }
 
 // 💸 REQUEST WITHDRAW
@@ -207,7 +226,7 @@ function requestWithdraw(index) {
     let inv = investments[index];
 
     if (inv.status !== "completed") {
-        alert("Investment not ready");
+        showPopup("Investment not ready", "#ff3d00");
         return;
     }
 
@@ -215,7 +234,7 @@ function requestWithdraw(index) {
     let amountPHP = totalCYT * 500;
 
     if (amountPHP < 10000) {
-        alert("Minimum withdrawal is ₱10,000");
+        showPopup("Minimum withdrawal is ₱10,000", "#ff3d00");
         return;
     }
 
@@ -242,14 +261,15 @@ function displayInvestments() {
 
         let now = Date.now();
 
-let remaining = inv.endTime - now;
-let totalDuration = inv.endTime - inv.startTime;
+let remaining = inv.endTime    ? inv.endTime - now    : (inv.startTime + (inv.plan * 86400000)) - now;
+let totalDuration = (inv.endTime && inv.startTime)    ? inv.endTime - inv.startTime    : inv.plan * 86400000;
 
-let progress = Math.min(((now - inv.startTime) / totalDuration) * 100, 100);
+let progress = inv.startTime    ? Math.min(((now - inv.startTime) / totalDuration) * 100, 100)    : 0;
 
 // ✅ MARK COMPLETE
-if (progress >= 100) {
+if (progress >= 100 && inv.status !== "completed") {
     inv.status = "completed";
+    saveUserData(); // ✅ ensures persistence
     remaining = 0;
 }
 
@@ -258,24 +278,46 @@ let timeText = formatTime(remaining);
 
         let li = document.createElement("li");
 
-        li.innerHTML = `
-            <div class="investment-card">
-                <h4>${inv.amount} CYT</h4>
-                <p>${inv.plan} Days Plan</p>
-                <p>Profit: ${inv.profit} CYT</p>
-                <p>Status: ${inv.status}</p>
+li.innerHTML = `
+    <div class="investment-card">
+        <h4>${inv.amount} CYT</h4>
+        <p>${inv.plan} Days Plan</p>
 
-                <p class="countdown">${timeText}</p>
+        <p style="color:${inv.status === 'completed' ? '#00c853' : '#ff3d00'};">
+            Profit: ${calculateLiveProfit(inv).toLocaleString()} CYT
+        </p>
 
-                <div class="progress-bar">
-                    <div class="progress" style="width:${progress}%"></div>
-                </div>
+        <p style="color:${inv.status === 'completed' ? '#00c853' : '#999'};">
+            Total Value: ₱${((inv.amount + calculateLiveProfit(inv)) * 500).toLocaleString()}
+        </p>
 
-                ${inv.status === "completed"
-                    ? `<p style="color:green;">Ready for withdrawal</p>`
-                    : ""}
-            </div>
-        `;
+        <p>
+            Status:
+            <span style="color:${inv.status === 'completed' ? '#00c853' : '#ff3d00'}; font-weight:bold;">
+                ${inv.status === 'completed' ? '✔ Completed' : '⏳ In Progress'}
+            </span>
+        </p>
+
+        <!-- ⏱ COUNTDOWN -->
+        <p class="countdown">${timeText}</p>
+
+        <!-- ✅ ADD HERE -->
+        <p style="font-size:12px; color:#888;">
+
+Ends at: ${inv.endTime ? new Date(inv.endTime).toLocaleString() : "Calculating..."}
+
+        </p>
+
+        <!-- 📊 PROGRESS -->
+        <div class="progress-bar">
+            <div class="progress" style="width:${progress}%"></div>
+        </div>
+
+        ${inv.status === "completed"
+            ? `<p style="color:green;">Ready for withdrawal</p>`
+            : ""}
+    </div>
+`;
 
         list.appendChild(li);
     });
@@ -292,6 +334,22 @@ function formatTime(ms) {
     let seconds = totalSeconds % 60;
 
     return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
+
+function calculateLiveProfit(inv) {
+    if (!inv.startTime || !inv.endTime) return 0;
+
+    let now = Date.now();
+
+    let totalDuration = inv.endTime - inv.startTime;
+    let elapsed = now - inv.startTime;
+
+    if (elapsed < 0) return 0;
+    if (elapsed > totalDuration) return inv.profit;
+
+    let progress = elapsed / totalDuration;
+
+    return Math.floor(inv.profit * progress);
 }
 
 // 📜 HISTORY
@@ -329,8 +387,8 @@ function updateAnalytics() {
         if (inv.status === "active") activeCount++;
     });
 
-    document.getElementById("totalInvested").innerText = totalInvested;
-document.getElementById("totalProfit").innerText = totalProfit;
+document.getElementById("totalInvested").innerText = totalInvested.toLocaleString();
+document.getElementById("totalProfit").innerText = totalProfit.toLocaleString();
 document.getElementById("activeCount").innerText = activeCount;
 }
 
@@ -347,7 +405,7 @@ function refreshAccount() {
 
         updateUI();
 
-        alert("Account updated!");
+        showPopup("Account updated!");
     });
 } // ✅ THIS WAS MISSING
 
@@ -362,7 +420,7 @@ function updateWithdrawable() {
     });
 
     document.getElementById("withdrawable").innerText =
-        "Withdrawable: ₱" + total;
+        "Withdrawable: ₱" + total.toLocaleString();
 }
 
 function withdrawAll() {
@@ -376,12 +434,12 @@ function withdrawAll() {
     });
 
     if (total <= 0) {
-        alert("No available balance to withdraw");
+        showPopup("No available balance to withdraw", "#ff3d00");
         return;
     }
 
     if (total < 10000) {
-        alert("Minimum withdrawal is ₱10,000");
+        showPopup("Minimum withdrawal is ₱10,000", "#ff3d00");
         return;
     }
 
@@ -389,7 +447,7 @@ function withdrawAll() {
     let receive = total - commission;
 
     let message =
-        `Hello Admin, I want to withdraw ₱${total}\n` +
+        `Hello Admin, I want to withdraw ₱${total.toLocaleString()}\n` +
         `Commission (30%): ₱${commission}\n` +
         `I will receive: ₱${receive}\n` +
         `Email: ${currentUser.email}`;
@@ -403,7 +461,51 @@ function withdrawAll() {
     updateUI();
 }
 
+function generateFakeActivity() {
+    const names = [
+        "John", "Sarah", "Michael", "David", "Grace", "Daniel"
+    ];
+
+    const actions = [
+        { text: "invested", icon: "📈" },
+        { text: "withdrew", icon: "💸" },
+        { text: "earned", icon: "💰" }
+    ];
+
+    const amounts = [10000, 20000, 50000, 75000, 120000];
+
+    let name = names[Math.floor(Math.random() * names.length)];
+    let action = actions[Math.floor(Math.random() * actions.length)];
+    let amount = amounts[Math.floor(Math.random() * amounts.length)];
+
+    return `${action.icon} ${name} ${action.text} ₱${amount.toLocaleString()}`;
+}
+
 // 🔁 AUTO REFRESH
 setInterval(() => {
+    updateWithdrawable();
+    updateAnalytics();
+}, 3000); // every 3 seconds
+
+setInterval(() => {
     displayInvestments();
-}, 1000); // updates every 1 second
+}, 1000); // keep smooth animation
+
+setInterval(() => {
+    const feed = document.getElementById("activityFeed");
+    if (!feed) return;
+
+    let li = document.createElement("li");
+    li.innerText = generateFakeActivity();
+
+feed.prepend(li);
+
+// trigger animation
+setTimeout(() => {
+    li.classList.add("show");
+}, 50);
+
+    if (feed.children.length > 5) {
+        feed.removeChild(feed.lastChild);
+    }
+}, 4000);

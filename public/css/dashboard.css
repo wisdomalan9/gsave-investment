@@ -173,3 +173,37 @@ li {
     color: #007DFF;
     margin-top: 8px;
 }
+
+#activityFeed li {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+}
+
+#activityFeed li.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.popup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #00c853;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 999;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
