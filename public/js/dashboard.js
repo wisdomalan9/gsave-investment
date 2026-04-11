@@ -181,14 +181,17 @@ let profitPercent =
 
     window.cyt -= amount;
 
-    investments.push({
-        amount,
-        plan,
-        profit,
-        status: "active",
-        startTime: Date.now(),
-        duration: plan * 86400000
-    });
+const start = Date.now();
+const duration = plan * 86400000;
+
+investments.push({
+    amount,
+    plan,
+    profit,
+    status: "active",
+    startTime: start,
+    endTime: start + duration
+});
 
     addHistory("Investment", `${amount} CYT for ${plan} days`);
 
@@ -237,16 +240,11 @@ function displayInvestments() {
     investments.forEach((inv, index) => {
 
         let now = Date.now();
-if (!inv.startTime || !inv.duration) {
-    inv.startTime = Date.now();
-    inv.duration = inv.plan * 86400000;
-}
 
-let elapsed = now - inv.startTime;
+let remaining = inv.endTime - now;
+let totalDuration = inv.endTime - inv.startTime;
 
-let remaining = inv.duration - elapsed;
-
-let progress = Math.min((elapsed / inv.duration) * 100, 100) || 0;
+let progress = Math.min(((now - inv.startTime) / totalDuration) * 100, 100);
 
 // ✅ MARK COMPLETE
 if (progress >= 100) {
