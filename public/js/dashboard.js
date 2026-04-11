@@ -93,6 +93,7 @@ function updateUI() {
     displayInvestments();
     displayHistory();
     updateAnalytics();
+updateWithdrawable();
 }
 
 // 🔓 LOGOUT
@@ -271,7 +272,7 @@ let timeText = formatTime(remaining);
                 </div>
 
                 ${inv.status === "completed"
-                    ? `<button onclick="requestWithdraw(${index})" class="btn">Withdraw</button>`
+                    ? `<p style="color:green;">Ready for withdrawal</p>`
                     : ""}
             </div>
         `;
@@ -332,6 +333,7 @@ function updateAnalytics() {
 document.getElementById("totalProfit").innerText = totalProfit;
 document.getElementById("activeCount").innerText = activeCount;
 }
+
 function refreshAccount() {
     if (!firebase.auth().currentUser) return;
 
@@ -347,6 +349,58 @@ function refreshAccount() {
 
         alert("Account updated!");
     });
+} // ✅ THIS WAS MISSING
+
+function updateWithdrawable() {
+    let total = 0;
+
+    investments.forEach(inv => {
+        if (inv.status === "completed") {
+            let totalCYT = inv.amount + inv.profit;
+            total += totalCYT * 500;
+        }
+    });
+
+    document.getElementById("withdrawable").innerText =
+        "Withdrawable: ₱" + total;
+}
+
+function withdrawAll() {
+    let total = 0;
+
+    investments.forEach(inv => {
+        if (inv.status === "completed") {
+            let totalCYT = inv.amount + inv.profit;
+            total += totalCYT * 500;
+        }
+    });
+
+    if (total <= 0) {
+        alert("No available balance to withdraw");
+        return;
+    }
+
+    if (total < 10000) {
+        alert("Minimum withdrawal is ₱10,000");
+        return;
+    }
+
+    let commission = Math.floor(total * 0.3);
+    let receive = total - commission;
+
+    let message =
+        `Hello Admin, I want to withdraw ₱${total}\n` +
+        `Commission (30%): ₱${commission}\n` +
+        `I will receive: ₱${receive}\n` +
+        `Email: ${currentUser.email}`;
+
+    window.open(`https://wa.me/17828611696?text=${encodeURIComponent(message)}`, "_blank");
+
+    // REMOVE COMPLETED INVESTMENTS
+    investments = investments.filter(inv => inv.status !== "completed");
+
+    saveUserData();
+    updateUI();
 }
 
 // 🔁 AUTO REFRESH

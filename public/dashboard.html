@@ -30,6 +30,9 @@
         <p class="label">Available Balance</p>
         <h1 id="balance">₱0</h1>
         <p id="cytBalance">CYT: 0</p>
+<p id="withdrawable" style="font-weight:bold; margin-top:10px;">
+    Withdrawable: ₱0
+</p>
     </div>
 
     <!-- QUICK ACTIONS -->
@@ -98,6 +101,10 @@
         <h3>History</h3>
         <ul id="historyList"></ul>
     </div>
+
+<button onclick="withdrawAll()" class="logout" style="background:#00c853;">
+    Withdraw All Funds
+</button>
 
     <!-- LOGOUT -->
     <button onclick="logout()" class="logout">Logout</button>
