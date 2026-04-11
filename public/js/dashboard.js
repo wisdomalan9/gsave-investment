@@ -236,32 +236,58 @@ function displayInvestments() {
 
     investments.forEach((inv, index) => {
 
-        let elapsed = Date.now() - inv.startTime;
+        let now = Date.now();
+        let elapsed = now - inv.startTime;
+        let remaining = inv.duration - elapsed;
+
         let progress = Math.min((elapsed / inv.duration) * 100, 100);
 
-        if (progress === 100) inv.status = "completed";
+        // ✅ MARK COMPLETE
+        if (progress >= 100) {
+            inv.status = "completed";
+            remaining = 0;
+        }
+
+        // ⏱️ TIME FORMAT
+        let timeText = formatTime(remaining);
 
         let li = document.createElement("li");
 
         li.innerHTML = `
             <div class="investment-card">
                 <h4>${inv.amount} CYT</h4>
-                <p>${inv.plan} days</p>
+                <p>${inv.plan} Days Plan</p>
                 <p>Profit: ${inv.profit} CYT</p>
                 <p>Status: ${inv.status}</p>
+
+                <p class="countdown">${timeText}</p>
 
                 <div class="progress-bar">
                     <div class="progress" style="width:${progress}%"></div>
                 </div>
 
                 ${inv.status === "completed"
-                    ? `<button onclick="requestWithdraw(${index})" class="btn">Request Withdrawal</button>`
+                    ? `<button onclick="requestWithdraw(${index})" class="btn">Withdraw</button>`
                     : ""}
             </div>
         `;
 
         list.appendChild(li);
     });
+}
+
+function formatTime(ms) {
+    if (ms <= 0) return "Completed";
+
+    let totalSeconds = Math.floor(ms / 1000);
+
+    let days = Math.floor(totalSeconds / 86400);
+    let hours = Math.floor((totalSeconds % 86400) / 3600);
+    let minutes = Math.floor((totalSeconds % 3600) / 60);
+    let seconds = totalSeconds % 60;
+    let milliseconds = ms % 1000;
+
+    return `${days}d ${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`;
 }
 
 // 📜 HISTORY
@@ -321,4 +347,6 @@ function refreshAccount() {
 }
 
 // 🔁 AUTO REFRESH
-setInterval(displayInvestments, 1000);
+setInterval(() => {
+    displayInvestments();
+}, 200); // updates every 0.2 seconds
