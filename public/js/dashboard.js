@@ -303,12 +303,10 @@ function updateAnalytics() {
 document.getElementById("totalProfit").innerText = totalProfit;
 document.getElementById("activeCount").innerText = activeCount;
 }
-
 function refreshAccount() {
-    firebase.auth().onAuthStateChanged(async (user) => {
-        if (!user) return;
+    if (!firebase.auth().currentUser) return;
 
-        const data = await syncUser(user);
+    syncUser(firebase.auth().currentUser).then(data => {
         if (!data) return;
 
         window.balance = Number(data.balance || 0);
