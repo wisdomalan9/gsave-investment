@@ -237,9 +237,13 @@ function displayInvestments() {
     investments.forEach((inv, index) => {
 
         let now = Date.now();
-        let elapsed = now - inv.startTime;
-        let remaining = inv.duration - elapsed;
+if (!inv.startTime || !inv.duration) {
+    inv.startTime = Date.now();
+    inv.duration = inv.plan * 86400000;
+}
 
+let elapsed = now - inv.startTime;
+let remaining = inv.duration - elapsed;
         let progress = Math.min((elapsed / inv.duration) * 100, 100);
 
         // ✅ MARK COMPLETE
