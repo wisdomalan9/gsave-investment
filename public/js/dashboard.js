@@ -244,7 +244,7 @@ if (!inv.startTime || !inv.duration) {
 
 let elapsed = now - inv.startTime;
 let remaining = inv.duration - elapsed;
-        let progress = Math.min((elapsed / inv.duration) * 100, 100);
+        let progress = Math.min((elapsed / inv.duration) * 100, 100).toFixed(2);
 
         // ✅ MARK COMPLETE
         if (progress >= 100) {
@@ -289,9 +289,8 @@ function formatTime(ms) {
     let hours = Math.floor((totalSeconds % 86400) / 3600);
     let minutes = Math.floor((totalSeconds % 3600) / 60);
     let seconds = totalSeconds % 60;
-    let milliseconds = ms % 1000;
 
-    return `${days}d ${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`;
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
 }
 
 // 📜 HISTORY
@@ -353,4 +352,4 @@ function refreshAccount() {
 // 🔁 AUTO REFRESH
 setInterval(() => {
     displayInvestments();
-}, 200); // updates every 0.2 seconds
+}, 50);

@@ -163,7 +163,7 @@ li {
     height: 100%;
     background: #00c853;
     border-radius: 10px;
-    transition: width 0.3s linear;
+    transition: width 0.1s linear;
 }
 
 /* COUNTDOWN TEXT */
