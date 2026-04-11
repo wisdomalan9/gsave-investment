@@ -243,7 +243,6 @@ if (!inv.startTime || !inv.duration) {
 }
 
 let elapsed = now - inv.startTime;
-elapsed = elapsed * 1;
 
 let remaining = inv.duration - elapsed;
 
