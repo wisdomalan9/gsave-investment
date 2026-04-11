@@ -1,9 +1,10 @@
 body {
     margin: 0;
-    font-family: Arial;
-    background: #f5f7fb;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
 }
 
+/* APP */
 .app {
     padding: 15px;
 }
@@ -13,54 +14,78 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 15px;
 }
 
-.header-left {
+.user-info {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
 .logo {
-    width: 40px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
 }
 
-.refresh {
+.user-info h4 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.user-info small {
+    font-size: 11px;
+    color: #777;
+}
+
+/* REFRESH */
+.refresh-btn {
     background: #00c853;
     color: white;
     border: none;
-    padding: 10px;
+    width: 38px;
+    height: 38px;
     border-radius: 10px;
+    font-size: 18px;
 }
 
 /* WALLET */
-.wallet {
+.wallet-card {
     background: linear-gradient(135deg, #00c853, #00e676);
-    padding: 20px;
-    border-radius: 20px;
+    padding: 18px;
+    border-radius: 18px;
     color: white;
-    margin: 20px 0;
+    margin-bottom: 20px;
+}
+
+.wallet-card h1 {
+    margin: 5px 0;
+    font-size: 26px;
+}
+
+.label {
+    font-size: 12px;
 }
 
 /* ACTIONS */
 .actions {
     display: flex;
-    justify-content: space-between;
+    gap: 10px;
     margin-bottom: 20px;
 }
 
 .actions button {
     flex: 1;
-    margin: 5px;
-    padding: 12px;
-    border: none;
+    padding: 10px;
     border-radius: 12px;
+    border: none;
     background: #00c853;
     color: white;
+    font-size: 13px;
 }
 
-/* CARD */
+/* CARDS */
 .card {
     background: white;
     padding: 15px;
@@ -90,16 +115,15 @@ input, select {
 /* STATS */
 .stats {
     display: flex;
-    justify-content: space-between;
+    gap: 10px;
     margin-bottom: 20px;
 }
 
-.stats div {
+.stat {
+    flex: 1;
     background: white;
     padding: 10px;
     border-radius: 12px;
-    flex: 1;
-    margin: 5px;
     text-align: center;
 }
 
