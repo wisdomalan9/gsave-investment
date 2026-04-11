@@ -243,8 +243,9 @@ if (!inv.startTime || !inv.duration) {
 }
 
 let elapsed = now - inv.startTime;
+elapsed = elapsed * 5;
 let remaining = inv.duration - elapsed;
-        let progress = Math.min((elapsed / inv.duration) * 100, 100).toFixed(2);
+        let progress = Math.min((elapsed / inv.duration) * 100, 100);
 
         // ✅ MARK COMPLETE
         if (progress >= 100) {
@@ -350,6 +351,9 @@ function refreshAccount() {
 }
 
 // 🔁 AUTO REFRESH
-setInterval(() => {
+function animate() {
     displayInvestments();
-}, 50);
+    requestAnimationFrame(animate);
+}
+
+animate();
