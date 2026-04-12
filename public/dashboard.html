@@ -9,14 +9,6 @@
 </head>
 
 <body>
-<div id="pinLock" class="pin-lock">
-    <div class="pin-box">
-        <h3>Enter PIN</h3>
-        <input type="password" id="pinInput" maxlength="4" placeholder="••••">
-        <button onclick="checkPin()">Unlock</button>
-    </div>
-</div>
-
 <div class="app">
 
     <!-- 🔵 HEADER -->
@@ -45,6 +37,16 @@
         <div class="action-card" onclick="withdrawAll()">💸 Withdraw</div>
     </div>
 
+<div class="card">
+    <h3>Deposit</h3>
+    <input type="number" id="depositAmount" placeholder="Enter amount">
+</div>
+
+<div class="card">
+    <h3>Buy CYT</h3>
+    <input type="number" id="amount" placeholder="Enter amount">
+</div>
+
     <!-- 📊 HOME -->
     <div id="homeSection" class="section active">
 
@@ -60,7 +62,8 @@
             <div>
                 <p>Active</p>
                 <h3 id="activeCount">0</h3>
-            </div>
+<ul id="activityFeed"></ul>    
+        </div>
         </div>
 
     </div>

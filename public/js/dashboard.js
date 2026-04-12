@@ -17,39 +17,11 @@ let currentUser = null;
 let history = [];
 let investments = [];
 
-function checkPin() {
-    const pin = document.getElementById("pinInput").value;
-
-    if (pin === "1234") {
-        document.getElementById("pinLock").style.display = "none";
-    } else {
-        showPopup("Wrong PIN", "#ff3d00");
-    }
-}
-
 function showPopup(message, color = "#00c853") {
     const popup = document.getElementById("popup");
     if (!popup) return;
 
     // reset first
-    popup.classList.remove("show");
-
-    popup.innerText = message;
-    popup.style.background = color;
-
-    setTimeout(() => {
-        popup.classList.add("show");
-    }, 10);
-
-    setTimeout(() => {
-        popup.classList.remove("show");
-    }, 3000);
-}
-
-function showPopup(message, color = "#00c853") {
-    const popup = document.getElementById("popup");
-    if (!popup) return;
-
     popup.classList.remove("show");
 
     popup.innerText = message;
@@ -550,28 +522,6 @@ function generateFakeActivity() {
 
     return `${action.icon} ${name} ${action.text} ₱${amount.toLocaleString()}`;
 }
-
-function showReceipt(title, details) {
-    const box = document.getElementById("receipt");
-
-    box.innerHTML = `
-        <h3>${title}</h3>
-        <p>${details}</p>
-        <button onclick="closeReceipt()">OK</button>
-    `;
-
-    box.classList.add("show");
-}
-
-function closeReceipt() {
-    document.getElementById("receipt").classList.remove("show");
-}
-
-function simulateLoading(callback) {
-    showPopup("Processing...");
-    setTimeout(callback, 1200);
-}
-
 
 // 🔁 AUTO REFRESH
 setInterval(() => {
