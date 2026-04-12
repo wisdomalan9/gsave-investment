@@ -9,83 +9,55 @@ body {
     padding: 15px;
 }
 
-/* HEADER */
-.header {
+/* 🔵 HEADER */
+.top-header {
+    background: linear-gradient(135deg, #007dff, #00aaff);
+    color: white;
+    padding: 20px;
+    border-radius: 0 0 20px 20px;
+}
+
+.user-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
 }
 
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.logo {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-}
-
-.user-info h4 {
-    margin: 0;
-    font-size: 14px;
-}
-
-.user-info small {
-    font-size: 11px;
-    color: #777;
-}
-
-/* REFRESH */
 .refresh-btn {
-    background: #00c853;
-    color: white;
+    background: white;
+    color: #007dff;
     border: none;
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 10px;
-    font-size: 18px;
 }
 
-/* WALLET */
-.wallet-card {
-    background: linear-gradient(135deg, #00c853, #00e676);
-    padding: 18px;
-    border-radius: 18px;
-    color: white;
-    margin-bottom: 20px;
-}
-
-.wallet-card h1 {
+/* 💰 BALANCE */
+.balance-box h1 {
     margin: 5px 0;
-    font-size: 26px;
+    font-size: 28px;
 }
 
-.label {
-    font-size: 12px;
-}
-
-/* ACTIONS */
-.actions {
-    display: flex;
+/* ⚪ QUICK ACTIONS */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+    margin-top: -20px;
     margin-bottom: 20px;
 }
 
-.actions button {
-    flex: 1;
-    padding: 10px;
-    border-radius: 12px;
-    border: none;
-    background: #00c853;
-    color: white;
+.action-card {
+    background: white;
+    padding: 15px;
+    text-align: center;
+    border-radius: 15px;
     font-size: 13px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    cursor: pointer;
 }
 
-/* CARDS */
+/* 💳 CARDS */
 .card {
     background: white;
     padding: 15px;
@@ -106,24 +78,20 @@ input, select {
 .card button {
     width: 100%;
     padding: 12px;
-    background: #00c853;
+    background: #007dff;
     border: none;
     color: white;
     border-radius: 10px;
 }
 
-/* STATS */
-.stats {
+/* 📊 STATS */
+.stats-card {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.stat {
-    flex: 1;
+    justify-content: space-between;
     background: white;
-    padding: 10px;
-    border-radius: 12px;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 15px;
     text-align: center;
 }
 
@@ -134,23 +102,35 @@ ul {
 }
 
 li {
-    background: #f1f1f1;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 8px;
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+/* WITHDRAW */
+.withdraw-btn {
+    width: 100%;
+    padding: 14px;
+    background: #00c853;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    margin-top: 10px;
 }
 
 /* LOGOUT */
 .logout {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     background: red;
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
+    margin-top: 10px;
 }
 
-/* PROGRESS BAR */
+/* PROGRESS */
 .progress-bar {
     width: 100%;
     height: 8px;
@@ -163,28 +143,9 @@ li {
     height: 100%;
     background: #00c853;
     border-radius: 10px;
-    transition: width 0.1s linear;
 }
 
-/* COUNTDOWN TEXT */
-.countdown {
-    font-size: 13px;
-    font-weight: bold;
-    color: #007DFF;
-    margin-top: 8px;
-}
-
-#activityFeed li {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.4s ease;
-}
-
-#activityFeed li.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-
+/* POPUP */
 .popup {
     position: fixed;
     bottom: 20px;
@@ -193,13 +154,9 @@ li {
     color: white;
     padding: 12px 18px;
     border-radius: 8px;
-    font-size: 14px;
-    z-index: 999;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-
     opacity: 0;
     transform: translateY(20px);
-    transition: all 0.3s ease;
+    transition: 0.3s;
 }
 
 .popup.show {
@@ -207,3 +164,100 @@ li {
     transform: translateY(0);
 }
 
+/* FLOAT WALLET */
+.wallet-float {
+    background: white;
+    margin-top: -30px;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+/* SECTIONS */
+.section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    box-shadow: 0 -3px 10px rgba(0,0,0,0.1);
+}
+
+.bottom-nav button {
+    background: none;
+    border: none;
+    font-size: 20px;
+}
+
+/* SPACING FIX */
+.app {
+    padding-bottom: 70px;
+}
+
+/* PIN LOCK */
+.pin-lock {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #007dff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.pin-box {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.pin-box input {
+    font-size: 20px;
+    text-align: center;
+    margin: 10px 0;
+}
+
+/* RECEIPT */
+.receipt {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    width: 85%;
+    max-width: 300px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: 0.3s;
+    z-index: 999;
+}
+
+.receipt.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}

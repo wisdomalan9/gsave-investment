@@ -17,6 +17,16 @@ let currentUser = null;
 let history = [];
 let investments = [];
 
+function checkPin() {
+    const pin = document.getElementById("pinInput").value;
+
+    if (pin === "1234") {
+        document.getElementById("pinLock").style.display = "none";
+    } else {
+        showPopup("Wrong PIN", "#ff3d00");
+    }
+}
+
 function showPopup(message, color = "#00c853") {
     const popup = document.getElementById("popup");
     if (!popup) return;
@@ -34,6 +44,47 @@ function showPopup(message, color = "#00c853") {
     setTimeout(() => {
         popup.classList.remove("show");
     }, 3000);
+}
+
+function showPopup(message, color = "#00c853") {
+    const popup = document.getElementById("popup");
+    if (!popup) return;
+
+    popup.classList.remove("show");
+
+    popup.innerText = message;
+    popup.style.background = color;
+
+    setTimeout(() => {
+        popup.classList.add("show");
+    }, 10);
+
+    setTimeout(() => {
+        popup.classList.remove("show");
+    }, 3000);
+}
+
+// ✅ ADD HERE (RIGHT AFTER showPopup)
+
+function simulateLoading(callback) {
+    showPopup("Processing...");
+    setTimeout(callback, 1200);
+}
+
+function showReceipt(title, details) {
+    const box = document.getElementById("receipt");
+
+    box.innerHTML = `
+        <h3>${title}</h3>
+        <p>${details}</p>
+        <button onclick="closeReceipt()">OK</button>
+    `;
+
+    box.classList.add("show");
+}
+
+function closeReceipt() {
+    document.getElementById("receipt").classList.remove("show");
 }
 
 // 🔁 SYNC USER
@@ -164,16 +215,18 @@ function buyCYT() {
         return;
     }
 
-    window.balance -= tokens * 500;
-    window.cyt += tokens;
+    simulateLoading(() => {
+        window.balance -= tokens * 500;
+        window.cyt += tokens;
 
-    addHistory("Buy CYT", `Purchased ${tokens} CYT`);
+        addHistory("Buy CYT", `Purchased ${tokens} CYT`);
 
-    saveUserData();
-    updateUI();
+        saveUserData();
+        updateUI();
 
-    showPopup("Purchased " + tokens + " CYT");
-}
+        showReceipt("Purchase Successful", `${tokens} CYT added`);
+    });
+} // ✅ THIS WAS MISSING
 
 // 📈 INVEST
 function invest() {
@@ -218,7 +271,7 @@ investments.push({
     saveUserData();
     updateUI();
 
-    showPopup("Investment successful!");
+    showReceipt("Investment Successful", `${amount} CYT invested`);
 }
 
 // 💸 REQUEST WITHDRAW
@@ -369,8 +422,25 @@ function displayHistory() {
     list.innerHTML = "";
 
     history.forEach(item => {
+        let icon =
+            item.type === "Investment" ? "📈" :
+            item.type === "Buy CYT" ? "🪙" :
+            "💰";
+
         let li = document.createElement("li");
-        li.innerHTML = `<strong>${item.type}</strong> - ${item.details}<br><small>${item.time}</small>`;
+
+        li.innerHTML = `
+            <div style="display:flex; justify-content:space-between;">
+                <div>
+                    <strong>${icon} ${item.type}</strong><br>
+                    <small>${item.details}</small>
+                </div>
+                <div>
+                    <small>${item.time}</small>
+                </div>
+            </div>
+        `;
+
         list.appendChild(li);
     });
 }
@@ -481,6 +551,28 @@ function generateFakeActivity() {
     return `${action.icon} ${name} ${action.text} ₱${amount.toLocaleString()}`;
 }
 
+function showReceipt(title, details) {
+    const box = document.getElementById("receipt");
+
+    box.innerHTML = `
+        <h3>${title}</h3>
+        <p>${details}</p>
+        <button onclick="closeReceipt()">OK</button>
+    `;
+
+    box.classList.add("show");
+}
+
+function closeReceipt() {
+    document.getElementById("receipt").classList.remove("show");
+}
+
+function simulateLoading(callback) {
+    showPopup("Processing...");
+    setTimeout(callback, 1200);
+}
+
+
 // 🔁 AUTO REFRESH
 setInterval(() => {
     updateWithdrawable();
@@ -509,3 +601,4 @@ setTimeout(() => {
         feed.removeChild(feed.lastChild);
     }
 }, 4000);
+

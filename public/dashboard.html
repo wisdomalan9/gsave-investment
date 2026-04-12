@@ -9,114 +9,119 @@
 </head>
 
 <body>
+<div id="pinLock" class="pin-lock">
+    <div class="pin-box">
+        <h3>Enter PIN</h3>
+        <input type="password" id="pinInput" maxlength="4" placeholder="••••">
+        <button onclick="checkPin()">Unlock</button>
+    </div>
+</div>
 
 <div class="app">
 
-    <!-- HEADER -->
-    <div class="header">
-        <div class="user-info">
-            <img src="images/ant.png" class="logo">
+    <!-- 🔵 HEADER -->
+    <div class="top-header">
+        <div class="user-row">
             <div>
-                <h4 id="userName">User</h4>
+                <h3 id="userName">User</h3>
                 <small id="userEmail"></small>
+            </div>
+            <button onclick="refreshAccount()" class="refresh-btn">⟳</button>
+        </div>
+    </div>
+    <!-- 💰 FLOATING WALLET -->
+    <div class="wallet-float">
+        <p>Available Balance</p>
+        <h1 id="balance">₱0</h1>
+        <p id="cytBalance">CYT: 0</p>
+        <p id="withdrawable">Withdrawable: ₱0</p>
+    </div>
+
+    <!-- ⚡ QUICK ACTIONS -->
+    <div class="quick-actions">
+        <div class="action-card" onclick="requestDeposit()">💰 Deposit</div>
+        <div class="action-card" onclick="buyCYT()">🪙 Buy</div>
+        <div class="action-card" onclick="showSection('invest')">📈 Invest</div>
+        <div class="action-card" onclick="withdrawAll()">💸 Withdraw</div>
+    </div>
+
+    <!-- 📊 HOME -->
+    <div id="homeSection" class="section active">
+
+        <div class="stats-card">
+            <div>
+                <p>Invested</p>
+                <h3 id="totalInvested">0</h3>
+            </div>
+            <div>
+                <p>Profit</p>
+                <h3 id="totalProfit">0</h3>
+            </div>
+            <div>
+                <p>Active</p>
+                <h3 id="activeCount">0</h3>
             </div>
         </div>
 
-        <button onclick="refreshAccount()" class="refresh-btn">⟳</button>
     </div>
 
-    <!-- WALLET -->
-    <div class="wallet-card">
-        <p class="label">Available Balance</p>
-        <h1 id="balance">₱0</h1>
-        <p id="cytBalance">CYT: 0</p>
-<p id="withdrawable" style="font-weight:bold; margin-top:10px;">
-    Withdrawable: ₱0
-</p>
-<ul id="activityFeed"></ul>
-    </div>
+    <!-- 📈 INVEST -->
+    <div id="investSection" class="section">
+        <div class="card">
+            <h3>Invest</h3>
+            <input type="number" id="investAmount" placeholder="Enter CYT">
 
-    <!-- QUICK ACTIONS -->
-    <div class="actions">
-        <button onclick="requestDeposit()">Deposit</button>
-        <button onclick="buyCYT()">Buy CYT</button>
-        <button onclick="document.getElementById('investSection').scrollIntoView()">Invest</button>
-    </div>
+            <select id="plan">
+                <option value="3">3 Days (50%)</option>
+                <option value="7">7 Days (70%)</option>
+                <option value="9">9 Days (90%)</option>
+                <option value="14">14 Days (120%)</option>
+                <option value="30">30 Days (300%)</option>
+            </select>
 
-    <!-- DEPOSIT -->
-    <div class="card">
-        <h3>Deposit</h3>
-        <input type="number" id="depositAmount" placeholder="Enter amount">
-        <button onclick="requestDeposit()">Request Deposit</button>
-    </div>
-
-    <!-- BUY CYT -->
-    <div class="card">
-        <h3>Buy CYT</h3>
-        <input type="number" id="amount" placeholder="Enter amount">
-        <button onclick="buyCYT()">Buy Now</button>
-    </div>
-
-    <!-- INVEST -->
-    <div class="card" id="investSection">
-        <h3>Invest</h3>
-        <input type="number" id="investAmount" placeholder="Enter CYT">
-
-        <select id="plan">
-            <option value="3">3 Days (50%)</option>
-            <option value="7">7 Days (70%)</option>
-            <option value="9">9 Days (90%)</option>
-            <option value="14">14 Days (120%)</option>
-            <option value="30">30 Days (300%)</option>
-        </select>
-
-        <button onclick="invest()">Start Investment</button>
-    </div>
-
-    <!-- STATS -->
-    <div class="stats">
-        <div class="stat">
-            <p>Invested</p>
-            <h3 id="totalInvested">0</h3>
+            <button onclick="invest()">Start Investment</button>
         </div>
 
-        <div class="stat">
-            <p>Profit</p>
-            <h3 id="totalProfit">0</h3>
-        </div>
-
-        <div class="stat">
-            <p>Active</p>
-            <h3 id="activeCount">0</h3>
+        <div class="card">
+            <h3>Investments</h3>
+            <ul id="investmentList"></ul>
         </div>
     </div>
 
-    <!-- INVESTMENTS -->
-    <div class="card">
-        <h3>Investments</h3>
-        <ul id="investmentList"></ul>
+    <!-- 📜 HISTORY -->
+    <div id="historySection" class="section">
+        <div class="card">
+            <h3>History</h3>
+            <ul id="historyList"></ul>
+        </div>
     </div>
-
-    <!-- HISTORY -->
-    <div class="card">
-        <h3>History</h3>
-        <ul id="historyList"></ul>
-    </div>
-
-<button onclick="withdrawAll()" class="logout" style="background:#00c853;">
-    Withdraw All Funds
-</button>
-
-    <!-- LOGOUT -->
-    <button onclick="logout()" class="logout">Logout</button>
 
 </div>
+
+<!-- 🔻 BOTTOM NAV -->
+<div class="bottom-nav">
+    <button onclick="showSection('home')">🏠</button>
+    <button onclick="showSection('invest')">📈</button>
+    <button onclick="showSection('history')">📜</button>
+    <button onclick="logout()">🚪</button>
+</div>
+
+<div id="popup" class="popup"></div>
+<div id="receipt" class="receipt"></div>
+<script>
+function showSection(section) {
+    document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+
+    if (section === "home") document.getElementById("homeSection").classList.add("active");
+    if (section === "invest") document.getElementById("investSection").classList.add("active");
+    if (section === "history") document.getElementById("historySection").classList.add("active");
+}
+</script>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
-<div id="popup" class="popup"></div>
 <script src="js/dashboard.js"></script>
 
 </body>
