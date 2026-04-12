@@ -1,67 +1,121 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #f4f6f9;
+    background: #eef2f7;
 }
 
-/* APP */
-.app {
-    padding: 15px;
-}
-
-/* 🔵 HEADER */
-.top-header {
-    background: linear-gradient(135deg, #007dff, #00aaff);
-    color: white;
-    padding: 20px;
-    border-radius: 0 0 20px 20px;
-}
-
-.user-row {
+/* LAYOUT */
+.layout {
     display: flex;
-    justify-content: space-between;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 220px;
+    background: #0d1b2a;
+    color: white;
+    height: 100vh;
+    padding: 20px;
+}
+
+.logo-box {
+    display: flex;
     align-items: center;
-}
-
-.refresh-btn {
-    background: white;
-    color: #007dff;
-    border: none;
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-}
-
-/* 💰 BALANCE */
-.balance-box h1 {
-    margin: 5px 0;
-    font-size: 28px;
-}
-
-/* ⚪ QUICK ACTIONS */
-.quick-actions {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    margin-top: -20px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
-.action-card {
-    background: white;
-    padding: 15px;
-    text-align: center;
-    border-radius: 15px;
-    font-size: 13px;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+.logo {
+    width: 40px;
+}
+
+.sidebar button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 12px;
+    background: none;
+    border: none;
+    color: white;
+    text-align: left;
     cursor: pointer;
 }
 
-/* 💳 CARDS */
+/* MAIN */
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+/* TOPBAR */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.refresh-btn {
+    background: #007dff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* WALLET */
+.wallet {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.wallet h1 {
+    margin: 5px 0;
+}
+
+.wallet-side {
+    text-align: right;
+}
+
+/* ACTIONS */
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.actions button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #007dff;
+    color: white;
+}
+
+/* STATS */
+.stats {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.stat {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+/* CARDS */
 .card {
     background: white;
     padding: 15px;
-    border-radius: 15px;
+    border-radius: 12px;
     margin-bottom: 15px;
 }
 
@@ -84,17 +138,6 @@ input, select {
     border-radius: 10px;
 }
 
-/* 📊 STATS */
-.stats-card {
-    display: flex;
-    justify-content: space-between;
-    background: white;
-    padding: 15px;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
 /* LIST */
 ul {
     list-style: none;
@@ -104,45 +147,17 @@ ul {
 li {
     background: #f9f9f9;
     padding: 12px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-}
-
-/* WITHDRAW */
-.withdraw-btn {
-    width: 100%;
-    padding: 14px;
-    background: #00c853;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    margin-top: 10px;
-}
-
-/* LOGOUT */
-.logout {
-    width: 100%;
-    padding: 14px;
-    background: red;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    margin-top: 10px;
-}
-
-/* PROGRESS */
-.progress-bar {
-    width: 100%;
-    height: 8px;
-    background: #ddd;
     border-radius: 10px;
-    margin-top: 10px;
+    margin-bottom: 8px;
 }
 
-.progress {
-    height: 100%;
-    background: #00c853;
-    border-radius: 10px;
+/* SECTION */
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
 }
 
 /* POPUP */
@@ -164,82 +179,6 @@ li {
     transform: translateY(0);
 }
 
-/* FLOAT WALLET */
-.wallet-float {
-    background: white;
-    margin-top: -30px;
-    padding: 20px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-
-/* SECTIONS */
-.section {
-    display: none;
-    animation: fadeIn 0.3s ease;
-}
-
-.section.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* BOTTOM NAV */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    display: flex;
-    justify-content: space-around;
-    padding: 10px;
-    box-shadow: 0 -3px 10px rgba(0,0,0,0.1);
-}
-
-.bottom-nav button {
-    background: none;
-    border: none;
-    font-size: 20px;
-}
-
-/* SPACING FIX */
-.app {
-    padding-bottom: 70px;
-}
-
-/* PIN LOCK */
-.pin-lock {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #007dff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.pin-box {
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    text-align: center;
-}
-
-.pin-box input {
-    font-size: 20px;
-    text-align: center;
-    margin: 10px 0;
-}
-
 /* RECEIPT */
 .receipt {
     position: fixed;
@@ -248,13 +187,10 @@ li {
     transform: translate(-50%, -50%) scale(0.8);
     background: white;
     padding: 20px;
-    border-radius: 15px;
-    width: 85%;
-    max-width: 300px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border-radius: 12px;
+    width: 300px;
     opacity: 0;
     transition: 0.3s;
-    z-index: 999;
 }
 
 .receipt.show {
