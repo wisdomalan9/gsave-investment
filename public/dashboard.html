@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body onload="showSection('invest')">
+<body onload="navigate('home', document.querySelector('.nav-btn'))">
 
 <!-- 🔵 HEADER -->
 <header class="header">
@@ -127,40 +127,57 @@
 
 <!-- 🔻 BOTTOM NAV -->
 <nav class="bottom-nav">
-    <button onclick="showSection('invest')">🏠</button>
-    <button onclick="showSection('invest')">📈</button>
-    <button onclick="showSection('history')">📜</button>
-    <button onclick="logout()">🚪</button>
+    <div class="nav-indicator" id="navIndicator"></div>
+
+    <button onclick="navigate('home', this)" class="nav-btn active">🏠</button>
+    <button onclick="navigate('invest', this)" class="nav-btn">📈</button>
+    <button onclick="navigate('history', this)" class="nav-btn">📜</button>
+    <button onclick="logout()" class="nav-btn">🚪</button>
 </nav>
 
 <!-- 🔄 SECTION SWITCH SCRIPT -->
 <script>
-function showSection(section) {
+function navigate(section, btn) {
 
     const sections = document.querySelectorAll(".section");
+    const buttons = document.querySelectorAll(".nav-btn");
+    const indicator = document.getElementById("navIndicator");
 
-    // Hide all sections
+    // 🔘 ACTIVE BUTTON
+    buttons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    // 🎯 MOVE INDICATOR
+    const index = Array.from(buttons).indexOf(btn);
+    indicator.style.transform = `translateX(${index * 100}%)`;
+
+    // 🔄 HIDE ALL
     sections.forEach(sec => {
-        sec.style.display = "none";
         sec.style.opacity = 0;
+        sec.style.transform = "translateY(20px)";
+        setTimeout(() => {
+            sec.style.display = "none";
+        }, 200);
     });
 
-    // Show INVEST
-    if (section === "invest") {
-        const el = document.getElementById("investSection");
-        el.style.display = "block";
-        setTimeout(() => el.style.opacity = 1, 50);
-    }
+    // 🏠 HOME
+    if (section === "home") return;
 
-    // Show HISTORY
-    if (section === "history") {
-        const el = document.getElementById("historySection");
-        el.style.display = "block";
-        setTimeout(() => el.style.opacity = 1, 50);
+    // 📈 INVEST
+    let target = null;
+    if (section === "invest") target = document.getElementById("investSection");
+    if (section === "history") target = document.getElementById("historySection");
+
+    if (target) {
+        target.style.display = "block";
+
+        setTimeout(() => {
+            target.style.opacity = 1;
+            target.style.transform = "translateY(0)";
+        }, 50);
     }
 }
 </script>
-
 <!-- 🔥 SCRIPTS -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>

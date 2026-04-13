@@ -247,3 +247,43 @@ li {
         margin: 20px auto;
     }
 }
+
+/* 🔻 NAV BUTTONS */
+.nav-btn {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+    color: #888;
+    transition: 0.3s;
+}
+
+.nav-btn.active {
+    color: #007dff;
+    transform: translateY(-3px);
+}
+
+/* 🎯 INDICATOR */
+.nav-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 25%;
+    height: 4px;
+    background: linear-gradient(90deg, #007dff, #00c6ff);
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+/* 🧭 NAV FIX */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    background: rgba(255,255,255,0.95);
+    padding: 10px 0;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+}
