@@ -7,12 +7,12 @@
 
 <link rel="stylesheet" href="css/dashboard.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
 </head>
 
 <body onload="showSection('invest')">
+
 <!-- 🔵 HEADER -->
-<div class="header">
+<header class="header">
     <div class="logo-box">
         <img src="images/ant.png" class="logo">
         <div>
@@ -26,31 +26,38 @@
         <small id="userEmail"></small>
         <button onclick="refreshAccount()">⟳</button>
     </div>
-</div>
+</header>
 
 <!-- 💰 BALANCE -->
-<div class="balance-card">
+<section class="balance-card">
     <h1 id="balance">₱0</h1>
     <p id="cytBalance">CYT: 0</p>
     <p id="withdrawable">Withdrawable: ₱0</p>
-</div>
+</section>
 
 <!-- ⚡ ACTIONS -->
-<div class="actions">
-    <input type="number" id="depositAmount" placeholder="Deposit amount">
-    <button onclick="requestDeposit()">Deposit</button>
+<section class="actions">
 
-    <input type="number" id="amount" placeholder="Buy CYT amount">
-    <button onclick="buyCYT()">Buy CYT</button>
+    <div class="action-group">
+        <input type="number" id="depositAmount" placeholder="Deposit amount">
+        <button onclick="requestDeposit()">Deposit</button>
+    </div>
+
+    <div class="action-group">
+        <input type="number" id="amount" placeholder="Buy CYT amount">
+        <button onclick="buyCYT()">Buy CYT</button>
+    </div>
 
     <div class="row">
         <button onclick="showSection('invest')">Invest</button>
         <button onclick="withdrawAll()">Withdraw</button>
     </div>
-</div>
+
+</section>
 
 <!-- 📊 STATS -->
-<div class="stats">
+<section class="stats">
+
     <div class="stat-box">
         <p>Invested</p>
         <h3 id="totalInvested">0</h3>
@@ -65,24 +72,27 @@
         <p>Active</p>
         <h3 id="activeCount">0</h3>
     </div>
-<div class="card">
+
+</section>
+
+<!-- 📊 PERFORMANCE CHART -->
+<section class="card">
     <h3>Performance Chart</h3>
     <canvas id="profitChart"></canvas>
-</div>
-
-</div>
+</section>
 
 <!-- 🔥 ACTIVITY -->
-<div class="card">
+<section class="card">
     <h3>Live Activity</h3>
     <ul id="activityFeed"></ul>
-</div>
+</section>
 
-<!-- 📈 INVEST -->
-<div id="investSection" class="section">
+<!-- 📈 INVEST SECTION -->
+<section id="investSection" class="section">
 
     <div class="card">
         <h3>Start Investment</h3>
+
         <input type="number" id="investAmount" placeholder="Enter CYT">
 
         <select id="plan">
@@ -101,28 +111,29 @@
         <ul id="investmentList"></ul>
     </div>
 
-</div>
+</section>
 
 <!-- 📜 HISTORY -->
-<div id="historySection" class="section">
+<section id="historySection" class="section">
     <div class="card">
         <h3>Transaction History</h3>
         <ul id="historyList"></ul>
     </div>
-</div>
+</section>
 
-<!-- POPUPS -->
+<!-- 🔔 POPUPS -->
 <div id="popup" class="popup"></div>
 <div id="receipt" class="receipt"></div>
 
 <!-- 🔻 BOTTOM NAV -->
-<div class="bottom-nav">
+<nav class="bottom-nav">
     <button onclick="showSection('')">🏠</button>
     <button onclick="showSection('invest')">📈</button>
     <button onclick="showSection('history')">📜</button>
     <button onclick="logout()">🚪</button>
-</div>
+</nav>
 
+<!-- 🔄 SECTION SWITCH SCRIPT -->
 <script>
 function showSection(section) {
 
@@ -148,6 +159,8 @@ function showSection(section) {
     }
 }
 </script>
+
+<!-- 🔥 SCRIPTS -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
