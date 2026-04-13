@@ -147,7 +147,9 @@ firebase.auth().onAuthStateChanged(async (user) => {
     investments = Array.isArray(data.investments) ? data.investments : [];
     history = Array.isArray(data.history) ? data.history : [];
 
-    updateUI();
+updateUI();
+showSection('invest');
+
 });
 
 // 🔄 UI UPDATE
