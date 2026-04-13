@@ -7,15 +7,18 @@ const path = require("path");
 
 const app = express();
 
+// 🔐 MIDDLEWARE
 app.use(cors());
 app.use(express.json());
+
+// 🔗 API ROUTES
 app.use("/api/user", userRoutes);
-// Serve frontend
+
+// 🌐 SERVE FRONTEND FILES
 app.use(express.static(path.join(__dirname, "public")));
 
-// Connect MongoDB
-
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://admin:070898@cluster0.igpn8ku.mongodb.net/gsave?retryWrites=true&w=majority";
+// 🔌 CONNECT MONGODB
+const MONGO_URI = process.env.MONGO_URI;
 
 console.log("🔗 Connecting to MongoDB...");
 
@@ -25,17 +28,20 @@ mongoose.connect(MONGO_URI)
     console.log("❌ MongoDB Connection Error:");
     console.log(err);
 });
-// Test route
-app.get("/", (req, res) => {
+
+// ✅ TEST API ROUTE
+app.get("/api", (req, res) => {
     res.send("API running...");
 });
 
-app.get("*", (req, res) => {
+// ✅ CATCH-ALL ROUTE (MUST BE LAST)
+app.get("/*", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "dashboard.html"));
 });
 
+// 🚀 START SERVER
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-    console.log("Server running on port " + PORT);
+    console.log("🚀 Server running on port " + PORT);
 });
