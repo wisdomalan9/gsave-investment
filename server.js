@@ -3,12 +3,15 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
+const path = require("path");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use("/api/user", userRoutes);
+// Serve frontend
+app.use(express.static(path.join(__dirname, "public")));
 
 // Connect MongoDB
 
@@ -25,6 +28,10 @@ mongoose.connect(MONGO_URI)
 // Test route
 app.get("/", (req, res) => {
     res.send("API running...");
+});
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "dashboard.html"));
 });
 
 const PORT = process.env.PORT || 5000;
