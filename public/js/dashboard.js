@@ -36,6 +36,29 @@ function showPopup(message, color = "#00c853") {
     }, 3000);
 }
 
+function animateValue(id, value, prefix = "") {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    let start = 0;
+    let duration = 800;
+    let startTime = null;
+
+    function animate(currentTime) {
+        if (!startTime) startTime = currentTime;
+        let progress = Math.min((currentTime - startTime) / duration, 1);
+
+        let current = Math.floor(progress * value);
+        el.innerText = prefix + current.toLocaleString();
+
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        }
+    }
+
+    requestAnimationFrame(animate);
+}
+
 // ✅ ADD HERE (RIGHT AFTER showPopup)
 
 function simulateLoading(callback) {
@@ -129,12 +152,13 @@ firebase.auth().onAuthStateChanged(async (user) => {
 
 // 🔄 UI UPDATE
 function updateUI() {
-    document.getElementById("balance").innerText = "₱" + window.balance.toLocaleString();
+    animateValue("balance", window.balance, "₱");
     document.getElementById("cytBalance").innerText = "CYT Balance: " + window.cyt;
 
     displayInvestments();
     displayHistory();
     updateAnalytics();
+
 updateWithdrawable();
 }
 
@@ -298,24 +322,25 @@ if (progress >= 100 && inv.status !== "completed") {
     remaining = 0;
 }
 
+
 // ⏱️ TIME FORMAT
 let timeText = formatTime(remaining);
 
         let li = document.createElement("li");
+let liveProfit = calculateLiveProfit(inv);
+let profitClass = liveProfit >= (inv.profit * 0.5) ? "profit-up" : "profit-down";
 
 li.innerHTML = `
     <div class="investment-card">
         <h4>${inv.amount} CYT</h4>
         <p>${inv.plan} Days Plan</p>
 
-        <p style="color:${inv.status === 'completed' ? '#00c853' : '#ff3d00'};">
-            Profit: ${calculateLiveProfit(inv).toLocaleString()} CYT
-        </p>
-
         <p style="color:${inv.status === 'completed' ? '#00c853' : '#999'};">
             Total Value: ₱${((inv.amount + calculateLiveProfit(inv)) * 500).toLocaleString()}
         </p>
-
+<p class="${profitClass}" style="font-weight:bold;">
+    Profit: ${liveProfit.toLocaleString()} CYT
+</p>
         <p>
             Status:
             <span style="color:${inv.status === 'completed' ? '#00c853' : '#ff3d00'}; font-weight:bold;">
@@ -332,15 +357,17 @@ li.innerHTML = `
 Ends at: ${inv.endTime ? new Date(inv.endTime).toLocaleString() : "Calculating..."}
 
         </p>
-
+<p style="font-size:12px; color:#555;">
+    ${getAIMessage(inv)}
+</p>
         <!-- 📊 PROGRESS -->
         <div class="progress-bar">
             <div class="progress" style="width:${progress}%"></div>
         </div>
 
-        ${inv.status === "completed"
-            ? `<p style="color:green;">Ready for withdrawal</p>`
-            : ""}
+${inv.status === "completed"
+    ? `<p style="color:green;">Ready for withdrawal</p>`
+    : ""}
     </div>
 `;
 
@@ -551,4 +578,87 @@ setTimeout(() => {
         feed.removeChild(feed.lastChild);
     }
 }, 4000);
+
+let chart;
+
+function initChart() {
+    const ctx = document.getElementById("profitChart");
+    if (!ctx) return;
+
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Profit',
+                data: [],
+borderColor: '#00c853',
+backgroundColor: 'rgba(0,200,83,0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: { display: false },
+                y: { display: true }
+            }
+        }
+    });
+}
+
+function updateChart() {
+    if (!chart) return;
+
+    let totalProfit = 0;
+
+    investments.forEach(inv => {
+        totalProfit += calculateLiveProfit(inv);
+    });
+
+    let time = new Date().toLocaleTimeString();
+
+    chart.data.labels.push(time);
+    chart.data.datasets[0].data.push(totalProfit);
+
+    if (chart.data.labels.length > 10) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+}
+    chart.update();
+}
+
+// INIT
+setTimeout(initChart, 1000);
+
+// AUTO UPDATE
+setInterval(updateChart, 3000);
+
+function simulateMarketGrowth() {
+    investments.forEach(inv => {
+        if (inv.status === "active") {
+            // small random boost (AI feel)
+            let boost = Math.random() * 0.02; // 2%
+
+            inv.profit += Math.floor(inv.profit * boost);
+        }
+    });
+
+    updateUI();
+}
+setInterval(simulateMarketGrowth, 5000);
+
+function getAIMessage(inv) {
+    if (inv.status === "completed") return "✅ AI: Investment completed successfully";
+    
+    let progress = (Date.now() - inv.startTime) / (inv.endTime - inv.startTime);
+
+    if (progress < 0.3) return "🧠 AI: Market just opened...";
+    if (progress < 0.7) return "📈 AI: Profit increasing steadily...";
+    return "🚀 AI: Near completion...";
+}
 
