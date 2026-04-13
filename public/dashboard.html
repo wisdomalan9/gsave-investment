@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body onload="navigate('home', document.querySelector('.nav-btn'))">
+<body onload="navigate('home', document.querySelectorAll('.nav-btn')[0])">
 
 <!-- 🔵 HEADER -->
 <header class="header">
@@ -49,7 +49,7 @@
     </div>
 
     <div class="row">
-        <button onclick="showSection('invest')">Invest</button>
+        <button onclick="navigate('invest', document.querySelectorAll('.nav-btn')[1])">Invest</button>
         <button onclick="withdrawAll()">Withdraw</button>
     </div>
 
