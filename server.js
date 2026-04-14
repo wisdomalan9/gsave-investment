@@ -14,7 +14,7 @@ app.use(express.json());
 // 🔗 API ROUTES
 app.use("/api/user", userRoutes);
 
-// 🌐 SERVE FRONTEND FILES
+// 🌐 SERVE STATIC FILES
 app.use(express.static(path.join(__dirname, "public")));
 
 // 🔌 CONNECT MONGODB
@@ -29,14 +29,14 @@ mongoose.connect(MONGO_URI)
     console.log(err);
 });
 
-// ✅ TEST API ROUTE
+// ✅ API TEST
 app.get("/api", (req, res) => {
     res.send("API running...");
 });
 
-// ✅ CATCH-ALL ROUTE (MUST BE LAST)
-app.get("/*", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "dashboard.html"));
+// ✅ SAFE CATCH-ALL (NO CRASH)
+app.use((req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // 🚀 START SERVER
