@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "g-save-investment"
-  }
+    "default": "g-save-investment",
+    "g-save-investment": "g-save-investment"
+  },
+  "targets": {},
+  "etags": {}
 }

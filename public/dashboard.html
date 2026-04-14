@@ -143,41 +143,40 @@ function navigate(section, btn) {
     const buttons = document.querySelectorAll(".nav-btn");
     const indicator = document.getElementById("navIndicator");
 
-    // 🔘 ACTIVE BUTTON
+    // ACTIVE BUTTON
     buttons.forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
 
-    // 🎯 MOVE INDICATOR
+    // MOVE INDICATOR
     const index = Array.from(buttons).indexOf(btn);
     indicator.style.transform = `translateX(${index * 100}%)`;
 
-    // 🔄 HIDE ALL
-    sections.forEach(sec => {
-        sec.style.opacity = 0;
-        sec.style.transform = "translateY(20px)";
-        setTimeout(() => {
-            sec.style.display = "none";
-        }, 200);
-    });
+    // HIDE ALL SECTIONS
+    sections.forEach(sec => sec.style.display = "none");
 
-    // 🏠 HOME
-    if (section === "home") return;
+    // 👉 SHOW BASE DASHBOARD (HOME)
+    const mainSections = document.querySelectorAll(
+        ".balance-card, .actions, .stats, .card"
+    );
 
-    // 📈 INVEST
-    let target = null;
-    if (section === "invest") target = document.getElementById("investSection");
-    if (section === "history") target = document.getElementById("historySection");
+    if (section === "home") {
+        mainSections.forEach(el => el.style.display = "block");
+        return;
+    }
 
-    if (target) {
-        target.style.display = "block";
+    // 👉 HIDE MAIN DASHBOARD
+    mainSections.forEach(el => el.style.display = "none");
 
-        setTimeout(() => {
-            target.style.opacity = 1;
-            target.style.transform = "translateY(0)";
-        }, 50);
+    // SHOW TARGET SECTION
+    if (section === "invest") {
+        document.getElementById("investSection").style.display = "block";
+    }
+
+    if (section === "history") {
+        document.getElementById("historySection").style.display = "block";
     }
 }
-</script>
+</script>	
 <!-- 🔥 SCRIPTS -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>

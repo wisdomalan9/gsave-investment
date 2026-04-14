@@ -3,7 +3,7 @@ body {
     margin: 0;
     font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg, #e6f2ff, #f5fbff);
-    padding-bottom: 80px;
+    padding-bottom: 90px; /* prevents nav overlap */
 }
 
 /* 🔵 HEADER */
@@ -11,6 +11,7 @@ body {
     background: linear-gradient(135deg, #007dff, #00c6ff);
     color: white;
     padding: 20px;
+padding-bottom: 50px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -42,7 +43,7 @@ body {
 .balance-card {
     background: linear-gradient(135deg, #00c6ff, #007dff);
     color: white;
-    margin: -35px 15px 20px;
+    margin: -30px 15px 20px;
     padding: 30px;
     border-radius: 18px;
     text-align: center;
@@ -229,10 +230,11 @@ li {
 /* 🔻 NAV BUTTONS */
 .nav-btn {
     flex: 1;
-    position: relative;
-    z-index: 2;
-    color: #888;
-    transition: 0.3s;
+    background: none;
+    border: none;
+    font-size: 20px;
+    text-align: center;
+    cursor: pointer;
 }
 
 .nav-btn.active {
@@ -259,9 +261,10 @@ li {
     left: 0;
     right: 0;
     display: flex;
-    background: rgba(255,255,255,0.95);
+    justify-content: space-around;
+    align-items: center;
+    background: white;
     padding: 10px 0;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+    border-top: 1px solid #eee;
+    z-index: 1000;
 }

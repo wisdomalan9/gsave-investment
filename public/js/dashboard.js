@@ -148,7 +148,7 @@ firebase.auth().onAuthStateChanged(async (user) => {
     history = Array.isArray(data.history) ? data.history : [];
 
 updateUI();
-showSection('invest');
+navigate('home', document.querySelectorAll('.nav-btn')[0]);
 
 });
 
@@ -560,7 +560,7 @@ setInterval(() => {
 
 setInterval(() => {
     displayInvestments();
-}, 1000); // keep smooth animation
+}, 3000); // keep smooth animation
 
 setInterval(() => {
     const feed = document.getElementById("activityFeed");
