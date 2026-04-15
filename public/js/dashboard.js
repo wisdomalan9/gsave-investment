@@ -17,6 +17,20 @@ let currentUser = null;
 let history = [];
 let investments = [];
 
+const plans = [
+  { id: 1, amount: 1000, return: 50000, duration: 6 * 60 * 60 * 1000 },
+  { id: 2, amount: 2000, return: 100500, duration: 12 * 60 * 60 * 1000 },
+  { id: 3, amount: 3000, return: 140000, duration: 24 * 60 * 60 * 1000 },
+  { id: 4, amount: 4000, return: 210000, duration: 2 * 24 * 60 * 60 * 1000 },
+  { id: 5, amount: 5000, return: 300000, duration: 3 * 24 * 60 * 60 * 1000 },
+  { id: 6, amount: 6000, return: 370000, duration: 4 * 24 * 60 * 60 * 1000 },
+  { id: 7, amount: 7000, return: 460000, duration: 5 * 24 * 60 * 60 * 1000 },
+  { id: 8, amount: 8000, return: 580000, duration: 6 * 24 * 60 * 60 * 1000 },
+  { id: 9, amount: 9000, return: 670000, duration: 7 * 24 * 60 * 60 * 1000 },
+  { id: 10, amount: 10000, return: 750000, duration: 7 * 24 * 60 * 60 * 1000 },
+  { id: 11, amount: 20000, return: 8300000, duration: 7 * 24 * 60 * 60 * 1000 }
+];
+
 function showPopup(message, color = "#00c853") {
     const popup = document.getElementById("popup");
     if (!popup) return;
@@ -60,6 +74,19 @@ function animateValue(id, value, prefix = "") {
 }
 
 // ✅ ADD HERE (RIGHT AFTER showPopup)
+function loadPlans() {
+    const select = document.getElementById("planSelect");
+    if (!select) return;
+
+    select.innerHTML = "";
+
+    plans.forEach(plan => {
+        const option = document.createElement("option");
+        option.value = plan.id;
+        option.textContent = `₱${plan.amount.toLocaleString()} → ₱${plan.return.toLocaleString()}`;
+        select.appendChild(option);
+    });
+}
 
 function simulateLoading(callback) {
     showPopup("Processing...");
@@ -148,8 +175,8 @@ firebase.auth().onAuthStateChanged(async (user) => {
     history = Array.isArray(data.history) ? data.history : [];
 
 updateUI();
+loadPlans();
 navigate('home', document.querySelectorAll('.nav-btn')[0]);
-
 });
 
 // 🔄 UI UPDATE
@@ -175,8 +202,8 @@ function logout() {
 function requestDeposit() {
     let amount = parseInt(document.getElementById("depositAmount").value);
 
-    if (!amount || amount < 2900) {
-        showPopup("Minimum deposit is ₱2,900", "#ff3d00");
+    if (!amount || amount < 1000) {
+        showPopup("Minimum deposit is ₱1000", "#ff3d00");
         return;
     }
 
@@ -228,48 +255,42 @@ function buyCYT() {
 
 // 📈 INVEST
 function invest() {
-    let amount = parseInt(document.getElementById("investAmount").value);
-    let plan = parseInt(document.getElementById("plan").value);
+    const selectedId = parseInt(document.getElementById("planSelect").value);
+    const plan = plans.find(p => p.id === selectedId);
 
-    if (!amount || amount < 6) {
-        showPopup("Minimum investment is 6 CYT (₱2,900)", "#ff3d00");
+    if (!plan) {
+        showPopup("Invalid plan", "#ff3d00");
         return;
     }
 
-    if (amount > window.cyt) {
-        showPopup("Not enough CYT", "#ff3d00");
+    if (window.balance < plan.amount) {
+        showPopup("Insufficient balance", "#ff3d00");
         return;
     }
 
-let profitPercent =
-    plan === 3 ? 50 :
-    plan === 7 ? 70 :
-    plan === 9 ? 90 :
-    plan === 14 ? 120 :
-    plan === 30 ? 300 : 0;
+    simulateLoading(() => {
 
-    let profit = Math.floor((amount * profitPercent) / 100);
+        window.balance -= plan.amount;
 
-    window.cyt -= amount;
+        const start = Date.now();
+        const end = start + plan.duration;
 
-const start = Date.now();
-const duration = plan * 86400000;
+        investments.push({
+            amount: plan.amount,
+            returnAmount: plan.return,
+            profit: plan.return - plan.amount,
+            status: "active",
+            startTime: start,
+            endTime: end
+        });
 
-investments.push({
-    amount,
-    plan,
-    profit,
-    status: "active",
-    startTime: start,
-    endTime: start + duration
-});
+        addHistory("Investment", `₱${plan.amount} → ₱${plan.return}`);
 
-    addHistory("Investment", `${amount} CYT for ${plan} days`);
+        saveUserData();
+        updateUI();
 
-    saveUserData();
-    updateUI();
-
-    showReceipt("Investment Successful", `${amount} CYT invested`);
+        showReceipt("Investment Successful", `₱${plan.amount} → ₱${plan.return}`);
+    });
 }
 
 // 💸 REQUEST WITHDRAW
@@ -317,9 +338,8 @@ if (investments.length === 0) {
 
         let now = Date.now();
 
-let remaining = inv.endTime    ? inv.endTime - now    : (inv.startTime + (inv.plan * 86400000)) - now;
-let totalDuration = (inv.endTime && inv.startTime)    ? inv.endTime - inv.startTime    : inv.plan * 86400000;
-
+let remaining = inv.endTime - now;
+let totalDuration = inv.endTime - inv.startTime;
 let progress = inv.startTime    ? Math.min(((now - inv.startTime) / totalDuration) * 100, 100)    : 0;
 
 // ✅ MARK COMPLETE
@@ -340,7 +360,9 @@ let profitClass = liveProfit >= (inv.profit * 0.5) ? "profit-up" : "profit-down"
 li.innerHTML = `
     <div class="investment-card">
         <h4>${inv.amount} CYT</h4>
-        <p>${inv.plan} Days Plan</p>
+<p>Invested: ₱${inv.amount.toLocaleString()}</p>
+<p>Return: ₱${inv.returnAmount.toLocaleString()}</p>
+<p>Profit: ₱${inv.profit.toLocaleString()}</p>
 
         <p style="color:${inv.status === 'completed' ? '#00c853' : '#999'};">
             Total Value: ₱${((inv.amount + calculateLiveProfit(inv)) * 500).toLocaleString()}
@@ -519,8 +541,8 @@ function withdrawAll() {
         return;
     }
 
-    if (total < 10000) {
-        showPopup("Minimum withdrawal is ₱10,000", "#ff3d00");
+    if (total < 1000) {
+        showPopup("Minimum withdrawal is ₱1000", "#ff3d00");
         return;
     }
 
