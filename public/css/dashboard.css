@@ -11,7 +11,6 @@ body {
     background: linear-gradient(135deg, #007dff, #00c6ff);
     color: white;
     padding: 20px;
-padding-bottom: 50px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -164,9 +163,10 @@ li {
 .section {
     display: none;
     opacity: 0;
+    margin: 20px;
     transition: opacity 0.3s ease;
+margin-bottom: 100px;
 }
-
 /* POPUP */
 .popup {
     position: fixed;
@@ -267,4 +267,8 @@ li {
     padding: 10px 0;
     border-top: 1px solid #eee;
     z-index: 1000;
+}
+
+html {
+    scroll-behavior: smooth;
 }

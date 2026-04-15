@@ -306,7 +306,12 @@ function displayInvestments() {
     const list = document.getElementById("investmentList");
     if (!list) return;
 
-    list.innerHTML = "";
+list.innerHTML = "";
+
+if (investments.length === 0) {
+    list.innerHTML = "<p style='text-align:center;color:#888;'>No investments yet</p>";
+    return;
+}
 
     investments.forEach((inv, index) => {
 
@@ -420,7 +425,12 @@ function displayHistory() {
     const list = document.getElementById("historyList");
     if (!list) return;
 
-    list.innerHTML = "";
+list.innerHTML = "";
+
+if (history.length === 0) {
+    list.innerHTML = "<p style='text-align:center;color:#888;'>No transactions yet</p>";
+    return;
+}
 
     history.forEach(item => {
         let icon =
