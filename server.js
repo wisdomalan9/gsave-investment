@@ -2,47 +2,79 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const path = require("path");
+
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-const path = require("path");
 
 const app = express();
 
-// 🔐 MIDDLEWARE
+/* =========================
+   MIDDLEWARE
+========================= */
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// 🔗 API ROUTES
-app.use("/api/user", userRoutes);
-app.use("/api/admin", adminRoutes);
-// 🌐 SERVE STATIC FILES
+/* =========================
+   STATIC FILES
+========================= */
 app.use(express.static(path.join(__dirname, "public")));
 
-// 🔌 CONNECT MONGODB
-const MONGO_URI = process.env.MONGO_URI;
+/* =========================
+   API ROUTES
+========================= */
+app.use("/api/user", userRoutes);
+app.use("/api/admin", adminRoutes);
 
-console.log("🔗 Connecting to MongoDB...");
-
-mongoose.connect(MONGO_URI)
-.then(() => console.log("✅ MongoDB Connected Successfully"))
-.catch(err => {
-    console.log("❌ MongoDB Connection Error:");
-    console.log(err);
-});
-
-// ✅ API TEST
+/* =========================
+   TEST ROUTE
+========================= */
 app.get("/api", (req, res) => {
-    res.send("API running...");
+  res.json({
+    success: true,
+    message: "API running successfully"
+  });
 });
 
-// ✅ SAFE CATCH-ALL (NO CRASH)
+/* =========================
+   PAGE ROUTES
+========================= */
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "login.html"));
+});
+
+app.get("/dashboard", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "dashboard.html"));
+});
+
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "admin.html"));
+});
+
+/* =========================
+   404 HANDLER
+========================= */
 app.use((req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.status(404).sendFile(path.join(__dirname, "public", "404.html"));
 });
 
-// 🚀 START SERVER
+/* =========================
+   DATABASE
+========================= */
+mongoose.connect(process.env.MONGO_URI)
+.then(() => console.log("✅ MongoDB Connected"))
+.catch(err => console.log("❌ Mongo Error:", err));
+
+/* =========================
+   START SERVER
+========================= */
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-    console.log("🚀 Server running on port " + PORT);
+  console.log("🚀 Server running on port " + PORT);
 });
