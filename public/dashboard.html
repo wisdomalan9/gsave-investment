@@ -1,327 +1,244 @@
-<!DOCTYPE html><html lang="en">
+<!-- FILE 1: public/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>G-SAVE Dashboard</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"><script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script><script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script><script src="https://cdn.jsdelivr.net/npm/chart.js"></script><style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,Helvetica,sans-serif;
-}
+<title>G-SAVE Dashboard</title>
 
-body{
-background:#eaf4ff;
-color:#111;
-padding:14px;
-padding-bottom:90px;
-}
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-.top{
-background:linear-gradient(135deg,#007dff,#0057d8);
-color:#fff;
-padding:20px;
-border-radius:22px;
-box-shadow:0 12px 30px rgba(0,80,255,.25);
-margin-bottom:16px;
-}
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
-.logo{
-display:flex;
-align-items:center;
-gap:10px;
-margin-bottom:10px;
-}
+<!-- Chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
 
-.logo img{
-width:42px;
-height:42px;
-border-radius:50%;
-object-fit:cover;
-background:#fff;
-}
+<body>
 
-.name{
-font-size:18px;
-font-weight:bold;
-}
+<!-- TOAST -->
+<div id="popup" class="popup">Success</div>
 
-.sub{
-font-size:13px;
-opacity:.9;
-}
-
-.balance{
-font-size:32px;
-font-weight:bold;
-margin-top:12px;
-}
-
-.small{
-font-size:13px;
-margin-top:6px;
-opacity:.95;
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:12px;
-margin-bottom:16px;
-}
-
-.action{
-background:#fff;
-border-radius:18px;
-padding:18px;
-text-align:center;
-box-shadow:0 8px 25px rgba(0,0,0,.08);
-cursor:pointer;
-transition:.2s;
-}
-
-.action:active{
-transform:scale(.97);
-}
-
-.action i{
-font-size:24px;
-color:#007dff;
-margin-bottom:8px;
-display:block;
-}
-
-.card{
-background:#fff;
-border-radius:20px;
-padding:16px;
-box-shadow:0 8px 25px rgba(0,0,0,.08);
-margin-bottom:16px;
-}
-
-.card h3{
-font-size:15px;
-margin-bottom:12px;
-color:#333;
-}
-
-.list{
-display:flex;
-flex-direction:column;
-gap:10px;
-}
-
-.item{
-padding:12px;
-border-radius:14px;
-background:#f5f8ff;
-font-size:14px;
-}
-
-.feed{
-max-height:220px;
-overflow:auto;
-}
-
-canvas{
-max-height:220px;
-}
-
-.modal{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.45);
-display:none;
-justify-content:center;
-align-items:flex-end;
-z-index:999;
-}
-
-.modal.show{
-display:flex;
-}
-
-.sheet{
-background:#fff;
-width:100%;
-max-width:520px;
-border-radius:24px 24px 0 0;
-padding:20px;
-animation:up .25s ease;
-}
-
-@keyframes up{
-from{transform:translateY(100%);}
-to{transform:translateY(0);}
-}
-
-.sheet h2{
-margin-bottom:14px;
-font-size:20px;
-}
-
-input,select{
-width:100%;
-padding:14px;
-border:1px solid #ddd;
-border-radius:14px;
-font-size:16px;
-margin-bottom:12px;
-}
-
-button{
-width:100%;
-border:none;
-padding:14px;
-border-radius:14px;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-}
-
-.primary{
-background:#007dff;
-color:#fff;
-}
-
-.secondary{
-background:#edf2ff;
-margin-top:8px;
-}
-
-.popup{
-position:fixed;
-top:18px;
-right:18px;
-background:#16a34a;
-color:#fff;
-padding:14px 18px;
-border-radius:12px;
-font-weight:bold;
-opacity:0;
-transform:translateY(-15px);
-transition:.3s;
-z-index:2000;
-}
-
-.popup.show{
-opacity:1;
-transform:translateY(0);
-}
-
-.receipt{
-position:fixed;
-inset:0;
-display:none;
-justify-content:center;
-align-items:center;
-background:rgba(0,0,0,.45);
-z-index:2001;
-}
-
-.receipt.show{
-display:flex;
-}
-
-.receipt-box{
-background:#fff;
-width:90%;
-max-width:360px;
-padding:22px;
-border-radius:20px;
-text-align:center;
-}
-
-.receipt-box h2{
-margin-bottom:10px;
-color:#16a34a;
-}
-
-.progress{
-height:10px;
-background:#e5e7eb;
-border-radius:99px;
-overflow:hidden;
-margin-top:8px;
-}
-
-.bar{
-height:100%;
-width:0%;
-background:#007dff;
-}
-
-.footer-space{
-height:20px;
-}
-</style></head><body><div class="popup" id="popup">Success</div><div class="receipt" id="receipt">
-<div class="receipt-box" id="receiptBox"></div>
-</div><div class="top">
-<div class="logo">
-<img src="images/logo.png">
-<div>
-<div class="name">G-SAVE INVESTMENT</div>
-<div class="sub" id="userEmail">Loading...</div>
+<!-- RECEIPT -->
+<div id="receipt" class="receipt hidden">
+  <div class="receipt-box" id="receiptBox"></div>
 </div>
-</div><div class="balance" id="balance">₱0</div>
-<div class="small" id="cytBalance">CYT Balance: 0</div>
-<div class="small" id="withdrawable">Withdrawable: ₱0</div>
-</div><div class="grid">
-<div class="action" onclick="openModal('depositModal')">
-<i class="fa-solid fa-wallet"></i>
-Deposit
-</div><div class="action" onclick="openModal('buyModal')">
-<i class="fa-solid fa-coins"></i>
-Buy CYT
-</div><div class="action" onclick="openModal('investModal')">
-<i class="fa-solid fa-chart-line"></i>
-Invest
-</div><div class="action" onclick="withdrawAll()">
-<i class="fa-solid fa-money-bill-transfer"></i>
-Withdraw
+
+<!-- TOP HEADER -->
+<header class="top-header">
+
+  <div class="header-row">
+    <div class="brand">
+      <img src="images/logo.png" alt="logo">
+      <div>
+        <h1>G-SAVE</h1>
+        <small>Investment Wallet</small>
+      </div>
+    </div>
+
+    <button class="icon-btn" onclick="logout()">
+      <i class="fa-solid fa-right-from-bracket"></i>
+    </button>
+  </div>
+
+  <div class="wallet-card">
+    <p>Available Peso Balance</p>
+    <h2 id="balance">₱0.00</h2>
+
+    <div class="wallet-mini">
+
+      <div>
+        <span>CYT Balance</span>
+        <strong id="cytBalance">0.000000</strong>
+      </div>
+
+      <div>
+        <span>Withdrawable</span>
+        <strong id="withdrawable">₱0.00</strong>
+      </div>
+
+    </div>
+
+    <small id="userEmail">Loading...</small>
+  </div>
+
+</header>
+
+<!-- ACTIONS -->
+<section class="actions-grid">
+
+  <button class="action-card" onclick="openModal('depositModal')">
+    <i class="fa-solid fa-wallet"></i>
+    <span>Deposit</span>
+  </button>
+
+  <button class="action-card" onclick="openModal('buyModal')">
+    <i class="fa-solid fa-coins"></i>
+    <span>Buy CYT</span>
+  </button>
+
+  <button class="action-card" onclick="openModal('investModal')">
+    <i class="fa-solid fa-chart-line"></i>
+    <span>Invest</span>
+  </button>
+
+  <button class="action-card" onclick="withdrawAll()">
+    <i class="fa-solid fa-money-bill-transfer"></i>
+    <span>Withdraw</span>
+  </button>
+
+</section>
+
+<!-- PROFIT CHART -->
+<section class="card">
+  <div class="card-head">
+    <h3>Live Growth</h3>
+  </div>
+  <canvas id="profitChart"></canvas>
+</section>
+
+<!-- INVESTMENTS -->
+<section class="card">
+  <div class="card-head">
+    <h3>My Investments</h3>
+  </div>
+  <div id="investmentList" class="stack-list">
+    <div class="empty">No investments yet</div>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section class="card">
+  <div class="card-head">
+    <h3>Transaction History</h3>
+  </div>
+  <div id="historyList" class="stack-list">
+    <div class="empty">No transactions yet</div>
+  </div>
+</section>
+
+<!-- LIVE FEED -->
+<section class="card">
+  <div class="card-head">
+    <h3>Live Activity</h3>
+  </div>
+  <div id="activityFeed" class="stack-list feed-list">
+    <div class="empty">Loading activity...</div>
+  </div>
+</section>
+
+<div class="bottom-space"></div>
+
+<!-- =========================
+DEPOSIT MODAL
+========================= -->
+<div class="modal hidden" id="depositModal">
+  <div class="modal-sheet">
+
+    <div class="sheet-head">
+      <h3>Deposit Peso</h3>
+      <button onclick="closeModal()" class="close-btn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <input
+      type="number"
+      id="depositAmount"
+      placeholder="Minimum ₱1,000"
+    >
+
+    <button class="primary-btn" onclick="requestDeposit()">
+      Send Request
+    </button>
+
+    <button class="secondary-btn" onclick="closeModal()">
+      Cancel
+    </button>
+
+  </div>
 </div>
-</div><div class="card">
-<h3>Live Profit Growth</h3>
-<canvas id="profitChart"></canvas>
-</div><div class="card">
-<h3>My Investments</h3>
-<div id="investmentList" class="list"></div>
-</div><div class="card">
-<h3>Transaction History</h3>
-<div id="historyList" class="list"></div>
-</div><div class="card">
-<h3>Live Activity</h3>
-<div id="activityFeed" class="list feed"></div>
-</div><div class="footer-space"></div><!-- Deposit --><div class="modal" id="depositModal">
-<div class="sheet">
-<h2>Deposit Peso</h2>
-<input id="depositAmount" type="number" placeholder="Minimum ₱1,000">
-<button class="primary" onclick="requestDeposit()">Send Request</button>
-<button class="secondary" onclick="closeModal()">Cancel</button>
+
+<!-- =========================
+BUY CYT MODAL
+========================= -->
+<div class="modal hidden" id="buyModal">
+  <div class="modal-sheet">
+
+    <div class="sheet-head">
+      <h3>Buy Cyber Token</h3>
+      <button onclick="closeModal()" class="close-btn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <input
+      type="number"
+      id="buyAmount"
+      placeholder="Enter Peso Amount"
+    >
+
+    <button class="primary-btn" onclick="buyCYT()">
+      Buy Now
+    </button>
+
+    <button class="secondary-btn" onclick="closeModal()">
+      Cancel
+    </button>
+
+  </div>
 </div>
-</div><!-- Buy --><div class="modal" id="buyModal">
-<div class="sheet">
-<h2>Buy Cyber Token</h2>
-<input id="amount" type="number" placeholder="Enter Peso Amount">
-<button class="primary" onclick="buyCYT()">Buy Now</button>
-<button class="secondary" onclick="closeModal()">Cancel</button>
+
+<!-- =========================
+INVEST MODAL
+========================= -->
+<div class="modal hidden" id="investModal">
+  <div class="modal-sheet">
+
+    <div class="sheet-head">
+      <h3>Start Investment</h3>
+      <button onclick="closeModal()" class="close-btn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <select id="planSelect"></select>
+
+    <button class="primary-btn" onclick="invest()">
+      Start Now
+    </button>
+
+    <button class="secondary-btn" onclick="closeModal()">
+      Cancel
+    </button>
+
+  </div>
 </div>
-</div><!-- Invest --><div class="modal" id="investModal">
-<div class="sheet">
-<h2>Invest CYT</h2>
-<select id="planSelect"></select>
-<button class="primary" onclick="invest()">Start Investment</button>
-<button class="secondary" onclick="closeModal()">Cancel</button>
-</div>
-</div><script>
+
+<!-- =========================
+HELPER UI
+========================= -->
+<script>
 function openModal(id){
-document.getElementById(id).classList.add("show");
+  document.getElementById(id).classList.remove("hidden");
 }
 
 function closeModal(){
-document.querySelectorAll(".modal").forEach(m=>{
-m.classList.remove("show");
-});
+  document.querySelectorAll(".modal").forEach(modal=>{
+    modal.classList.add("hidden");
+  });
 }
-</script><script src="js/dashboard.js"></script></body>
+
+function closeReceipt(){
+  document.getElementById("receipt").classList.add("hidden");
+}
+</script>
+
+<!-- MAIN JS -->
+<script src="js/dashboard.js"></script>
+
+</body>
 </html>

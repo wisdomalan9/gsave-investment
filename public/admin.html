@@ -1,8 +1,14 @@
-<!DOCTYPE html><html lang="en">
+<!-- FILE 3: public/admin.html -->
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>G-SAVE ADMIN PANEL</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"><style>
+<title>G-SAVE Admin Panel</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
 *{
 margin:0;
 padding:0;
@@ -11,88 +17,121 @@ font-family:Arial,Helvetica,sans-serif;
 }
 
 body{
-background:#0f172a;
+background:#0b1220;
 color:#fff;
-padding:20px;
+padding:16px;
 }
 
+/* HEADER */
 .topbar{
-background:linear-gradient(135deg,#1e293b,#0f172a);
+background:linear-gradient(135deg,#111827,#1e293b);
 padding:18px;
 border-radius:18px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-bottom:20px;
-box-shadow:0 10px 30px rgba(0,0,0,.3);
+gap:12px;
+box-shadow:0 10px 30px rgba(0,0,0,.35);
+margin-bottom:16px;
 }
 
-.topbar h1{
-font-size:20px;
+.brand{
+display:flex;
+align-items:center;
+gap:10px;
 }
 
-.logout{
-background:#ef4444;
+.brand i{
+font-size:22px;
+color:#38bdf8;
+}
+
+.brand h1{
+font-size:18px;
+}
+
+.brand small{
+display:block;
+opacity:.75;
+font-size:12px;
+margin-top:2px;
+}
+
+.logout-btn{
 border:none;
-padding:10px 16px;
-border-radius:10px;
+background:#ef4444;
 color:#fff;
+padding:10px 14px;
+border-radius:12px;
 font-weight:bold;
 cursor:pointer;
 }
 
-.grid{
+/* STATS */
+.stats{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:15px;
-margin-bottom:20px;
+grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+gap:12px;
+margin-bottom:16px;
 }
 
 .card{
-background:#1e293b;
-padding:18px;
+background:#111827;
+border:1px solid rgba(255,255,255,.06);
 border-radius:18px;
+padding:16px;
 box-shadow:0 8px 25px rgba(0,0,0,.25);
 }
 
 .card h3{
-font-size:14px;
-opacity:.8;
-margin-bottom:10px;
+font-size:13px;
+opacity:.75;
+margin-bottom:8px;
 }
 
 .card h2{
-font-size:28px;
+font-size:24px;
 }
 
-.search{
-margin-bottom:20px;
+/* SEARCH */
+.toolbar{
 display:flex;
 gap:10px;
+margin-bottom:16px;
+flex-wrap:wrap;
 }
 
-.search input{
+.toolbar input{
 flex:1;
+min-width:220px;
 padding:14px;
 border:none;
 border-radius:12px;
-font-size:16px;
+font-size:15px;
+background:#111827;
+color:#fff;
+outline:none;
 }
 
-.search button{
-padding:14px 18px;
+.toolbar button{
 border:none;
-background:#2563eb;
-color:#fff;
-font-weight:bold;
+padding:14px 16px;
 border-radius:12px;
 cursor:pointer;
+font-weight:bold;
+color:#fff;
 }
 
-.table-box{
-background:#1e293b;
+.blue{background:#2563eb;}
+.green{background:#16a34a;}
+.red{background:#dc2626;}
+.gray{background:#374151;}
+
+/* TABLE */
+.table-wrap{
+background:#111827;
 border-radius:18px;
-padding:15px;
+padding:12px;
 overflow:auto;
 box-shadow:0 8px 25px rgba(0,0,0,.25);
 }
@@ -106,39 +145,44 @@ min-width:900px;
 th,td{
 padding:14px;
 text-align:left;
-border-bottom:1px solid rgba(255,255,255,.08);
+border-bottom:1px solid rgba(255,255,255,.06);
 font-size:14px;
+vertical-align:middle;
 }
 
 th{
 color:#60a5fa;
+font-size:13px;
 }
 
-.action-btn{
-padding:8px 12px;
+.action-row{
+display:flex;
+gap:6px;
+flex-wrap:wrap;
+}
+
+.small-btn{
 border:none;
-border-radius:8px;
+padding:8px 10px;
+border-radius:10px;
 font-size:12px;
 font-weight:bold;
 cursor:pointer;
-margin:2px;
+color:#fff;
 }
 
-.green{background:#16a34a;color:#fff;}
-.red{background:#dc2626;color:#fff;}
-.blue{background:#2563eb;color:#fff;}
-
+/* POPUP */
 .popup{
 position:fixed;
-top:20px;
-right:20px;
+top:18px;
+right:18px;
 background:#16a34a;
 padding:14px 18px;
 border-radius:12px;
 font-weight:bold;
 opacity:0;
-transform:translateY(-20px);
-transition:.3s;
+transform:translateY(-15px);
+transition:.25s;
 z-index:999;
 }
 
@@ -147,50 +191,134 @@ opacity:1;
 transform:translateY(0);
 }
 
+/* EMPTY */
+.empty{
+padding:16px;
+opacity:.7;
+text-align:center;
+}
+
+/* MOBILE */
 @media(max-width:768px){
+
 .topbar{
 flex-direction:column;
-gap:12px;
 align-items:flex-start;
 }
+
+.brand h1{
+font-size:16px;
 }
-</style></head><body><div class="popup" id="popup">Success</div><div class="topbar">
-<h1><i class="fa-solid fa-shield-halved"></i> G-SAVE ADMIN PANEL</h1>
-<button class="logout" onclick="logoutAdmin()">Logout</button>
-</div><div class="grid">
+
+.card h2{
+font-size:22px;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<!-- TOAST -->
+<div class="popup" id="popup">Success</div>
+
+<!-- HEADER -->
+<header class="topbar">
+
+<div class="brand">
+<i class="fa-solid fa-shield-halved"></i>
+
+<div>
+<h1>G-SAVE ADMIN</h1>
+<small>Manage users, deposits & withdrawals</small>
+</div>
+</div>
+
+<button class="logout-btn" onclick="logoutAdmin()">
+<i class="fa-solid fa-right-from-bracket"></i>
+ Logout
+</button>
+
+</header>
+
+<!-- STATS -->
+<section class="stats">
+
 <div class="card">
 <h3>Total Users</h3>
 <h2 id="totalUsers">0</h2>
-</div><div class="card">
+</div>
+
+<div class="card">
 <h3>Total Balances</h3>
 <h2 id="totalBalance">₱0</h2>
-</div><div class="card">
+</div>
+
+<div class="card">
 <h3>Total CYT</h3>
 <h2 id="totalCYT">0</h2>
-</div><div class="card">
-<h3>Active Users</h3>
+</div>
+
+<div class="card">
+<h3>Active Investors</h3>
 <h2 id="activeUsers">0</h2>
 </div>
-</div><div class="search">
-<input type="text" id="searchEmail" placeholder="Search user email...">
-<button onclick="searchUser()"><i class="fa fa-search"></i> Search</button>
-<button onclick="loadUsers()"><i class="fa fa-rotate"></i> Refresh</button>
-</div><div class="table-box">
+
+</section>
+
+<!-- TOOLBAR -->
+<section class="toolbar">
+
+<input
+type="text"
+id="searchEmail"
+placeholder="Search name or email..."
+>
+
+<button class="blue" onclick="searchUser()">
+<i class="fa-solid fa-magnifying-glass"></i>
+ Search
+</button>
+
+<button class="gray" onclick="loadUsers()">
+<i class="fa-solid fa-rotate"></i>
+ Refresh
+</button>
+
+</section>
+
+<!-- TABLE -->
+<section class="table-wrap">
+
 <table>
+
 <thead>
 <tr>
 <th>Name</th>
 <th>Email</th>
 <th>Balance</th>
 <th>CYT</th>
+<th>Withdrawable</th>
 <th>Investments</th>
 <th>Actions</th>
 </tr>
-</thead><tbody id="userTable">
+</thead>
+
+<tbody id="userTable">
+
 <tr>
-<td colspan="6">Loading users...</td>
+<td colspan="7" class="empty">Loading users...</td>
 </tr>
+
 </tbody>
+
 </table>
-</div><script src="admin.js"></script></body>
+
+</section>
+
+<!-- MAIN JS -->
+<script src="admin.js"></script>
+
+</body>
 </html>

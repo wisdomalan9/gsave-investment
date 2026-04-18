@@ -1,203 +1,328 @@
-const API = "https://gsave-investment.onrender.com/api/admin";
-const AUTH = "admin123";
+// FILE 4: public/admin.js
 
-// 🔐 SIMPLE ADMIN LOGIN
-const pass = prompt("Enter Admin Password");
+console.log("✅ ADMIN PANEL LOADED");
 
-if (pass !== AUTH) {
-alert("Access Denied");
-window.location.href = "/";
+/* ===================================
+   CONFIG
+=================================== */
+const API = "/api/admin";
+const ADMIN_PASS = "admin123";
+
+/* ===================================
+   SIMPLE ACCESS GATE
+=================================== */
+const entered = prompt("Enter Admin Password");
+
+if (entered !== ADMIN_PASS) {
+  alert("Access Denied");
+  window.location.href = "/";
 }
 
-// 🔔 POPUP
-function showPopup(msg,color="#16a34a"){
-const p = document.getElementById("popup");
-p.innerText = msg;
-p.style.background = color;
-p.classList.add("show");
-
-setTimeout(()=>{
-    p.classList.remove("show");
-},2500);
-
+/* ===================================
+   HELPERS
+=================================== */
+function php(v) {
+  return "₱" + Number(v).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
 }
 
-// 📦 LOAD USERS
-async function loadUsers(){
-try{
-const res = await fetch(API + "/users",{
-headers:{ Authorization: AUTH }
-});
+function showPopup(msg, color = "#16a34a") {
+  const pop = document.getElementById("popup");
+  if (!pop) return;
 
-const users = await res.json();
+  pop.innerText = msg;
+  pop.style.background = color;
+  pop.classList.add("show");
 
-renderUsers(users);
-loadStats(users);
-
-}catch(err){
-showPopup("Failed loading users","#dc2626");
-}
+  setTimeout(() => {
+    pop.classList.remove("show");
+  }, 2500);
 }
 
-// 📊 STATS
-function loadStats(users){
-
-document.getElementById("totalUsers").innerText = users.length;
-
-let bal = 0;
-let cyt = 0;
-let active = 0;
-
-users.forEach(u=>{
-bal += Number(u.balance || 0);
-cyt += Number(u.cyt || 0);
-
-if((u.investments || []).length > 0) active++;
-});
-
-document.getElementById("totalBalance").innerText =
-"₱" + bal.toLocaleString();
-
-document.getElementById("totalCYT").innerText =
-cyt.toFixed(6);
-
-document.getElementById("activeUsers").innerText =
-active;
+function authHeaders() {
+  return {
+    "Content-Type": "application/json",
+    "Authorization": ADMIN_PASS
+  };
 }
 
-// 📋 TABLE
-function renderUsers(users){
+/* ===================================
+   LOAD USERS
+=================================== */
+async function loadUsers() {
 
-const table = document.getElementById("userTable");
+  try {
+    const res = await fetch(API + "/users", {
+      headers: {
+        "Authorization": ADMIN_PASS
+      }
+    });
 
-if(!users.length){
-table.innerHTML = "<tr><td colspan="6">No users found</td></tr>";
-return;
+    const users = await res.json();
+
+    if (!Array.isArray(users)) {
+      showPopup("Failed to load users", "#dc2626");
+      return;
+    }
+
+    renderUsers(users);
+    renderStats(users);
+
+  } catch (err) {
+    showPopup("Server error", "#dc2626");
+  }
 }
 
-table.innerHTML = "";
+/* ===================================
+   STATS
+=================================== */
+function renderStats(users) {
 
-users.forEach(user=>{
+  document.getElementById("totalUsers").innerText =
+    users.length;
 
-table.innerHTML += `
+  let totalBalance = 0;
+  let totalCYT = 0;
+  let active = 0;
 
-<tr>
-<td>${user.name || "User"}</td>
-<td>${user.email}</td>
-<td>₱${Number(user.balance||0).toLocaleString()}</td>
-<td>${Number(user.cyt||0).toFixed(6)}</td>
-<td>${(user.investments||[]).length}</td><td>
-<button class="action-btn green"
-onclick="credit('${user.email}')">
-Deposit
-</button><button class="action-btn blue"
-onclick="withdraw('${user.email}')">
-Withdraw
-</button>
+  users.forEach(u => {
 
-<button class="action-btn red"
-onclick="removeUser('${user.email}')">
-Delete
-</button>
+    totalBalance += Number(u.balance || 0);
+    totalCYT += Number(u.cyt || 0);
 
-</td>
-</tr>
-`;
-});
-}// 💰 CREDIT USER
-async function credit(email){
+    if (
+      Array.isArray(u.investments) &&
+      u.investments.length > 0
+    ) {
+      active++;
+    }
 
-const amount = prompt("Enter deposit amount");
+  });
 
-if(!amount) return;
+  document.getElementById("totalBalance").innerText =
+    php(totalBalance);
 
-const res = await fetch(API + "/credit",{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-Authorization: AUTH
-},
-body:JSON.stringify({
-email,
-amount:Number(amount)
-})
-});
+  document.getElementById("totalCYT").innerText =
+    totalCYT.toFixed(6);
 
-const data = await res.json();
+  document.getElementById("activeUsers").innerText =
+    active;
+}
 
-showPopup(data.msg || "Credited");
+/* ===================================
+   TABLE
+=================================== */
+function renderUsers(users) {
+
+  const table = document.getElementById("userTable");
+
+  if (!users.length) {
+    table.innerHTML =
+      `<tr><td colspan="7" class="empty">No users found</td></tr>`;
+    return;
+  }
+
+  table.innerHTML = "";
+
+  users.forEach(user => {
+
+    const name = user.name || "User";
+    const email = user.email || "-";
+    const balance = php(user.balance || 0);
+    const cyt = Number(user.cyt || 0).toFixed(6);
+    const wd = php(user.withdrawable || 0);
+
+    const invCount =
+      Array.isArray(user.investments)
+        ? user.investments.length
+        : 0;
+
+    table.innerHTML += `
+      <tr>
+        <td>${name}</td>
+        <td>${email}</td>
+        <td>${balance}</td>
+        <td>${cyt}</td>
+        <td>${wd}</td>
+        <td>${invCount}</td>
+
+        <td>
+          <div class="action-row">
+
+            <button
+              class="small-btn green"
+              onclick="creditUser('${email}')"
+            >
+              Deposit
+            </button>
+
+            <button
+              class="small-btn blue"
+              onclick="withdrawUser('${email}')"
+            >
+              Withdraw
+            </button>
+
+            <button
+              class="small-btn red"
+              onclick="deleteUser('${email}')"
+            >
+              Delete
+            </button>
+
+          </div>
+        </td>
+
+      </tr>
+    `;
+  });
+}
+
+/* ===================================
+   CREDIT USER
+=================================== */
+async function creditUser(email) {
+
+  const amount = prompt(
+    "Enter deposit amount to approve:"
+  );
+
+  if (!amount) return;
+
+  try {
+    const res = await fetch(API + "/credit", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        email,
+        amount: Number(amount)
+      })
+    });
+
+    const data = await res.json();
+
+    showPopup(
+      data.msg || "Deposit approved"
+    );
+
+    loadUsers();
+
+  } catch (err) {
+    showPopup("Failed", "#dc2626");
+  }
+}
+
+/* ===================================
+   WITHDRAW USER
+=================================== */
+async function withdrawUser(email) {
+
+  const amount = prompt(
+    "Enter withdrawal amount:"
+  );
+
+  if (!amount) return;
+
+  try {
+    const res = await fetch(API + "/withdraw", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        email,
+        amount: Number(amount)
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showPopup(data.msg || "Failed", "#dc2626");
+      return;
+    }
+
+    showPopup(
+      data.msg || "Withdrawal approved"
+    );
+
+    loadUsers();
+
+  } catch (err) {
+    showPopup("Failed", "#dc2626");
+  }
+}
+
+/* ===================================
+   DELETE USER
+=================================== */
+async function deleteUser(email) {
+
+  const yes = confirm(
+    "Delete this user permanently?"
+  );
+
+  if (!yes) return;
+
+  try {
+    const res = await fetch(API + "/delete", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        email
+      })
+    });
+
+    const data = await res.json();
+
+    showPopup(
+      data.msg || "Deleted",
+      "#dc2626"
+    );
+
+    loadUsers();
+
+  } catch (err) {
+    showPopup("Failed", "#dc2626");
+  }
+}
+
+/* ===================================
+   SEARCH
+=================================== */
+function searchUser() {
+
+  const q =
+    document.getElementById("searchEmail")
+    .value
+    .toLowerCase()
+    .trim();
+
+  const rows =
+    document.querySelectorAll("#userTable tr");
+
+  rows.forEach(row => {
+
+    const txt =
+      row.innerText.toLowerCase();
+
+    row.style.display =
+      txt.includes(q) ? "" : "none";
+  });
+}
+
+/* ===================================
+   LOGOUT
+=================================== */
+function logoutAdmin() {
+  window.location.href = "/";
+}
+
+/* ===================================
+   AUTO START
+=================================== */
 loadUsers();
-}
 
-// 💸 WITHDRAW USER
-async function withdraw(email){
-
-const amount = prompt("Enter withdrawal amount");
-
-if(!amount) return;
-
-const res = await fetch(API + "/withdraw",{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-Authorization: AUTH
-},
-body:JSON.stringify({
-email,
-amount:Number(amount)
-})
-});
-
-const data = await res.json();
-
-showPopup(data.msg || "Processed");
-loadUsers();
-}
-
-// ❌ DELETE USER
-async function removeUser(email){
-
-if(!confirm("Delete this user?")) return;
-
-const res = await fetch(API + "/delete",{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-Authorization: AUTH
-},
-body:JSON.stringify({email})
-});
-
-const data = await res.json();
-
-showPopup(data.msg || "Deleted","#dc2626");
-loadUsers();
-}
-
-// 🔍 SEARCH
-function searchUser(){
-
-const val =
-document.getElementById("searchEmail")
-.value
-.toLowerCase();
-
-const rows =
-document.querySelectorAll("#userTable tr");
-
-rows.forEach(row=>{
-row.style.display =
-row.innerText.toLowerCase().includes(val)
-? ""
-: "none";
-});
-}
-
-// 🚪 LOGOUT
-function logoutAdmin(){
-window.location.href = "/";
-}
-
-// AUTO LOAD
-loadUsers();
-setInterval(loadUsers,10000);
+setInterval(() => {
+  loadUsers();
+}, 15000);

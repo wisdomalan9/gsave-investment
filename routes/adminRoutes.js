@@ -1,119 +1,183 @@
+// FILE 5: routes/adminRoutes.js
+
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 
-// 🔐 SIMPLE ADMIN SECURITY
-router.use((req,res,next)=>{
+/* ===================================
+   SIMPLE ADMIN AUTH
+=================================== */
+router.use((req, res, next) => {
+  const auth = req.headers.authorization;
 
-const auth = req.headers.authorization;
+  if (auth !== "admin123") {
+    return res.status(403).json({
+      success: false,
+      msg: "Unauthorized"
+    });
+  }
 
-if(auth !== "admin123"){
-return res.status(403).json({
-msg:"Unauthorized"
-});
-}
-
-next();
-});
-
-// 📦 GET ALL USERS
-router.get("/users", async (req,res)=>{
-try{
-
-const users = await User.find().sort({createdAt:-1});
-
-res.json(users);
-
-}catch(err){
-res.status(500).json({
-msg:"Failed to load users"
-});
-}
+  next();
 });
 
-// 💰 CREDIT USER (DEPOSIT APPROVAL)
-router.post("/credit", async (req,res)=>{
-try{
+/* ===================================
+   GET ALL USERS
+=================================== */
+router.get("/users", async (req, res) => {
+  try {
+    const users = await User.find()
+      .sort({ createdAt: -1 });
 
-const { email, amount } = req.body;
+    res.json(users);
 
-const user = await User.findOne({ email });
-
-if(!user){
-return res.status(404).json({
-msg:"User not found"
-});
-}
-
-user.balance =
-Number(user.balance || 0) + Number(amount);
-
-await user.save();
-
-res.json({
-msg:"Deposit Approved Successfully"
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      msg: "Failed to load users"
+    });
+  }
 });
 
-}catch(err){
-res.status(500).json({
-msg:"Deposit failed"
-});
-}
-});
+/* ===================================
+   APPROVE DEPOSIT
+   Adds money to wallet balance
+=================================== */
+router.post("/credit", async (req, res) => {
+  try {
+    const { email, amount } = req.body;
 
-// 💸 PROCESS WITHDRAWAL
-router.post("/withdraw", async (req,res)=>{
-try{
+    const user = await User.findOne({ email });
 
-const { email, amount } = req.body;
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        msg: "User not found"
+      });
+    }
 
-const user = await User.findOne({ email });
+    const add = Number(amount || 0);
 
-if(!user){
-return res.status(404).json({
-msg:"User not found"
-});
-}
+    if (add <= 0) {
+      return res.status(400).json({
+        success: false,
+        msg: "Invalid amount"
+      });
+    }
 
-if(Number(user.balance || 0) < Number(amount)){
-return res.status(400).json({
-msg:"Insufficient balance"
-});
-}
+    user.balance =
+      Number(user.balance || 0) + add;
 
-user.balance =
-Number(user.balance || 0) - Number(amount);
+    user.history = user.history || [];
 
-await user.save();
+    user.history.unshift({
+      type: "Admin Deposit",
+      details: `₱${add.toLocaleString()} credited`,
+      time: new Date().toLocaleString()
+    });
 
-res.json({
-msg:"Withdrawal Approved"
-});
+    await user.save();
 
-}catch(err){
-res.status(500).json({
-msg:"Withdrawal failed"
-});
-}
-});
+    res.json({
+      success: true,
+      msg: "Deposit Approved Successfully"
+    });
 
-// ❌ DELETE USER
-router.post("/delete", async (req,res)=>{
-try{
-
-const { email } = req.body;
-
-await User.deleteOne({ email });
-
-res.json({
-msg:"User Deleted"
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      msg: "Deposit failed"
+    });
+  }
 });
 
-}catch(err){
-res.status(500).json({
-msg:"Delete failed"
+/* ===================================
+   PROCESS WITHDRAWAL
+   Deducts from withdrawable balance
+=================================== */
+router.post("/withdraw", async (req, res) => {
+  try {
+    const { email, amount } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        msg: "User not found"
+      });
+    }
+
+    const take = Number(amount || 0);
+
+    if (take <= 0) {
+      return res.status(400).json({
+        success: false,
+        msg: "Invalid amount"
+      });
+    }
+
+    if (Number(user.withdrawable || 0) < take) {
+      return res.status(400).json({
+        success: false,
+        msg: "Insufficient withdrawable balance"
+      });
+    }
+
+    user.withdrawable =
+      Number(user.withdrawable || 0) - take;
+
+    user.history = user.history || [];
+
+    user.history.unshift({
+      type: "Admin Withdrawal",
+      details: `₱${take.toLocaleString()} paid out`,
+      time: new Date().toLocaleString()
+    });
+
+    await user.save();
+
+    res.json({
+      success: true,
+      msg: "Withdrawal Approved"
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      msg: "Withdrawal failed"
+    });
+  }
 });
-}
+
+/* ===================================
+   DELETE USER
+=================================== */
+router.post("/delete", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        msg: "User not found"
+      });
+    }
+
+    await User.deleteOne({ email });
+
+    res.json({
+      success: true,
+      msg: "User Deleted"
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      msg: "Delete failed"
+    });
+  }
 });
 
 module.exports = router;

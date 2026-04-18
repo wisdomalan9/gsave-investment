@@ -1,185 +1,162 @@
+<!-- FILE 6: public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>G-Save Investment</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>G-SAVE Investment</title>
+
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
-<style>
-.logo img {
-    width: 32px;
-    border-radius: 8px; /* 🔥 smooth look */
-}
-</style>
-
-<!-- POPUP -->
-<div id="popup" class="popup">
-    <div class="popup-content">
-        <img src="images/ant.png" class="popup-logo">
-        <h2>Welcome to G-Save Investment</h2>
-        <p>
-            This platform is designed to help you understand how investment systems work in a simple and practical way. 
-            You will be able to deposit funds, convert them into a digital token (CYT), invest for a specific number of days, 
-            and see how profits are calculated over time.
-        </p>
-        <button onclick="closePopup()">Continue</button>
-    </div>
-</div>
 
 <!-- NAVBAR -->
 <header class="navbar">
-    <div class="logo">
-        <img src="images/ant.png" class="logo-img">
-        <span>G-Save Investment</span>
-    </div>
+
+<div class="nav-brand">
+<img src="images/logo.png" alt="logo">
+<span>G-SAVE</span>
+</div>
+
+<a href="login.html" class="nav-btn">
+Get Started
+</a>
+
 </header>
 
 <!-- HERO -->
 <section class="hero">
 
-<video autoplay muted loop class="bg-video">
-    <source src="videos/hero-bg.mp4">
-</video>
-
-<div class="overlay"></div>
+<div class="hero-overlay"></div>
 
 <div class="hero-content">
-    <h1>Learn and Practice Investment Step by Step</h1>
-    <p>
-        G-Save Investment allows you to understand how digital investment works from beginning to end. 
-        You will start with a wallet balance, convert it into CyberToken (CYT), choose an investment plan, 
-        and track your profits until completion.
-    </p>
 
-    <a href="login.html">
-        <button class="btn">Get Started</button>
-    </a>
+<div class="badge">
+<i class="fa-solid fa-shield-halved"></i>
+ Trusted Digital Wallet
+</div>
+
+<h1>
+Grow Your Funds With
+Smart CYT Investment
+</h1>
+
+<p>
+Deposit Philippine Peso, convert into Cyber Token (CYT),
+choose an investment package, and track your returns
+in real time.
+</p>
+
+<div class="hero-actions">
+<a href="login.html" class="btn-primary">
+Start Now
+</a>
+
+<a href="#plans" class="btn-secondary">
+View Plans
+</a>
+</div>
+
+</div>
+
+</section>
+
+<!-- STATS -->
+<section class="stats">
+
+<div class="stat-card">
+<h2>₱3,000,000</h2>
+<p>1 CYT Rate</p>
+</div>
+
+<div class="stat-card">
+<h2>6 Hours</h2>
+<p>Fastest Package</p>
+</div>
+
+<div class="stat-card">
+<h2>72 Hours</h2>
+<p>Longest Package</p>
 </div>
 
 </section>
 
 <!-- FEATURES -->
-<section class="features">
+<section class="section">
 
-<h2 class="section-title">What You Can Do on This Platform</h2>
+<h2 class="section-title">
+Why Choose G-SAVE?
+</h2>
 
-<div class="features-container">
-
-<div class="feature-card">
-<h3>Manage Your Wallet</h3>
-<p>
-Every user has a wallet where money is stored. You can deposit funds into your wallet and use that balance 
-to perform different activities inside the system.
-</p>
-</div>
+<div class="grid-3">
 
 <div class="feature-card">
-<h3>Convert to CYT</h3>
+<i class="fa-solid fa-wallet"></i>
+<h3>Easy Deposits</h3>
 <p>
-Before you can invest, you need to convert your wallet balance into CyberToken (CYT). 
-This is the digital token used for all investments on this platform.
+Send deposit request and get credited after approval.
 </p>
 </div>
 
 <div class="feature-card">
-<h3>Invest for a Duration</h3>
-<p>
-You can choose how long you want your investment to run — from 7 days to 60 days. 
-Each plan has a different return based on the duration you select.
-</p>
-</div>
-
-<div class="feature-card">
-<h3>Track Your Progress</h3>
-<p>
-Once you invest, your progress is tracked in real-time. You can see how much time is left and when your 
-investment will be completed.
-</p>
-</div>
-
-</div>
-
-</section>
-
-<!-- CYT -->
-<section class="cyt">
-
-<div class="cyt-container">
-
-<div class="cyt-text">
-<h2>What is CyberToken (CYT)?</h2>
-
-<p>
-CyberToken (CYT) is the main unit used for investment in this system. Instead of investing directly with your wallet balance, 
-you first convert your money into CYT and then use it for investment.
-</p>
-
-<div class="cyt-box">
-<h3>1 CYT = ₱500</h3>
-<p>
-For example, if you have ₱5,000, you can convert it into 10 CYT. 
-You can then use those 10 CYT to start an investment plan.
-</p>
-</div>
-
-</div>
-
-<div class="cyt-visual">
-<div class="cyt-circle">CYT</div>
-</div>
-
-</div>
-
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="how">
-
-<h2 class="section-title">How the System Works</h2>
-
-<div class="how-container">
-
-<div class="how-step">
-<div class="step-number">1</div>
-<h3>Login</h3>
-<p>
-Sign in using your Google account to access your personal dashboard.
-</p>
-</div>
-
-<div class="how-step">
-<div class="step-number">2</div>
-<h3>Deposit Funds</h3>
-<p>
-Add money to your wallet. This is the balance you will use for all your activities.
-</p>
-</div>
-
-<div class="how-step">
-<div class="step-number">3</div>
+<i class="fa-solid fa-coins"></i>
 <h3>Buy CYT</h3>
 <p>
-Convert your wallet balance into CYT at a fixed rate of ₱500 per token.
+Convert peso balance into Cyber Token instantly.
 </p>
 </div>
 
-<div class="how-step">
-<div class="step-number">4</div>
-<h3>Start Investment</h3>
+<div class="feature-card">
+<i class="fa-solid fa-chart-line"></i>
+<h3>Track Growth</h3>
 <p>
-Choose a plan (7–60 days) and invest your CYT. Your investment will start immediately.
+Watch investment progress live until maturity.
 </p>
 </div>
 
-<div class="how-step">
-<div class="step-number">5</div>
-<h3>Earn Profit</h3>
-<p>
-Once the investment period is completed, your profit will be added and you can withdraw it.
-</p>
+</div>
+
+</section>
+
+<!-- HOW -->
+<section class="section alt">
+
+<h2 class="section-title">
+How It Works
+</h2>
+
+<div class="steps">
+
+<div class="step">
+<span>1</span>
+<h3>Create Account</h3>
+<p>Login with Google in seconds.</p>
+</div>
+
+<div class="step">
+<span>2</span>
+<h3>Deposit Peso</h3>
+<p>Fund your wallet through admin approval.</p>
+</div>
+
+<div class="step">
+<span>3</span>
+<h3>Buy CYT</h3>
+<p>Use wallet funds to buy Cyber Token.</p>
+</div>
+
+<div class="step">
+<span>4</span>
+<h3>Invest</h3>
+<p>Select any package from 6h to 72h.</p>
+</div>
+
+<div class="step">
+<span>5</span>
+<h3>Withdraw</h3>
+<p>Receive matured returns after approval.</p>
 </div>
 
 </div>
@@ -187,77 +164,36 @@ Once the investment period is completed, your profit will be added and you can w
 </section>
 
 <!-- PLANS -->
-<section class="plans">
+<section class="section" id="plans">
 
-<h2 class="section-title">Available Investment Plans</h2>
+<h2 class="section-title">
+Popular Investment Packages
+</h2>
 
-<div class="plans-container">
-
-<div class="plan-card">
-<h3>7 Days Plan</h3>
-<p class="plan-return">30% Profit</p>
-<p>This is a short-term plan designed for quick returns.</p>
-<button onclick="location.href='login.html'">Start</button>
-</div>
+<div class="plans-grid">
 
 <div class="plan-card">
-<h3>14 Days Plan</h3>
-<p class="plan-return">60% Profit</p>
-<p>This plan gives a higher return over a slightly longer period.</p>
-<button onclick="location.href='login.html'">Start</button>
-</div>
-
-<div class="plan-card">
-<h3>21 Days Plan</h3>
-<p class="plan-return">90% Profit</p>
-<p>A balanced plan between time and profit.</p>
-<button onclick="location.href='login.html'">Start</button>
+<h3>Starter</h3>
+<h2>₱1,000</h2>
+<p>Earn ₱50,000</p>
+<small>6 Hours</small>
+<a href="login.html">Start</a>
 </div>
 
 <div class="plan-card featured">
-<h3>30 Days Plan</h3>
-<p class="plan-return">95% Profit</p>
-<p>This is one of the most stable and commonly used plans.</p>
-<button onclick="location.href='login.html'">Start</button>
+<h3>Advanced</h3>
+<h2>₱10,000</h2>
+<p>Earn ₱750,000</p>
+<small>60 Hours</small>
+<a href="login.html">Start</a>
 </div>
 
 <div class="plan-card">
-<h3>60 Days Plan</h3>
-<p class="plan-return">150% Profit</p>
-<p>A long-term plan with the highest return.</p>
-<button onclick="location.href='login.html'">Start</button>
-</div>
-
-</div>
-
-</section>
-
-<!-- TESTIMONIALS -->
-<section class="testimonials">
-
-<h2 class="section-title">User Experience</h2>
-
-<div class="testimonials-container">
-
-<div class="video-card">
-<video controls>
-<source src="videos/hero-bg.mp4">
-</video>
-<p>“I now understand how investment timing works.”</p>
-</div>
-
-<div class="video-card">
-<video controls>
-<source src="videos/hero-bg.mp4">
-</video>
-<p>“Very easy to follow even for beginners.”</p>
-</div>
-
-<div class="video-card">
-<video controls>
-<source src="videos/hero-bg.mp4">
-</video>
-<p>“The system makes everything clear step by step.”</p>
+<h3>Premium</h3>
+<h2>₱20,000</h2>
+<p>Earn ₱8,300,000</p>
+<small>72 Hours</small>
+<a href="login.html">Start</a>
 </div>
 
 </div>
@@ -267,19 +203,24 @@ Once the investment period is completed, your profit will be added and you can w
 <!-- CTA -->
 <section class="cta">
 
-<h2>Start Your Investment Journey</h2>
+<h2>
+Start Building Wealth Today
+</h2>
+
 <p>
-Create your account, explore the dashboard, and begin learning how digital investments work in a structured way.
+Join G-SAVE and access premium digital investment opportunities.
 </p>
 
-<button onclick="location.href='login.html'" class="cta-btn">Get Started</button>
+<a href="login.html" class="btn-primary wide">
+Continue with Google
+</a>
 
 </section>
 
 <!-- FOOTER -->
 <footer class="footer">
-<p>© 2026 G-Save Investment</p>
+© 2026 G-SAVE Investment. All rights reserved.
 </footer>
-<script src="js/script.js"></script>
+
 </body>
 </html>

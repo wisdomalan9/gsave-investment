@@ -1,56 +1,63 @@
+<!-- FILE 7: public/login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - G-Save Investment</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Login - G-SAVE</title>
+
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 </head>
 
-<body>
-<style>
-.logo img {
-    width: 32px;
-    border-radius: 8px; /* 🔥 smooth look */
-}
+<body class="login-page">
 
-.login-logo {
-    width: 70px;
-    border-radius: 12px;
-}
-</style>
+<section class="login-wrap">
 
-<section class="login">
+<div class="login-card">
 
-    <div class="login-box">
+<div class="login-logo">
+<img src="images/logo.png" alt="logo">
+</div>
 
-        <img src="images/ant.png" class="login-logo">
+<div class="login-brand">
+<h1>G-SAVE</h1>
+<p>Secure Investment Wallet</p>
+</div>
 
-        <h2>Welcome Back</h2>
+<div class="login-text">
+<h2>Welcome Back</h2>
 
-        <p>
-            Sign in to access your dashboard, manage your wallet, convert funds into CYT, 
-            and continue your investment activities.
-        </p>
+<p>
+Login with your Google account to access your dashboard,
+manage deposits, buy CYT, invest, and withdraw earnings.
+</p>
+</div>
 
-        <button onclick="googleLogin()" class="google-btn">
-            Continue with Google
-        </button>
+<button class="google-login-btn" onclick="googleLogin()">
+<i class="fa-brands fa-google"></i>
+ Continue with Google
+</button>
 
-        <!-- OPTIONAL EXTRA INFO -->
-        <div style="margin-top:15px; font-size:12px; color:#777;">
-            By continuing, you agree to use this platform as your investment environment.
-        </div>
+<div class="mini-note">
+Protected by secure authentication.
+</div>
 
-    </div>
+<div class="back-home">
+<a href="index.html">
+<i class="fa-solid fa-arrow-left"></i>
+ Back to Home
+</a>
+</div>
+
+</div>
 
 </section>
 
-<!-- ✅ FIXED FIREBASE SCRIPTS -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-
 <script src="js/auth.js"></script>
-
 </body>
 </html>
