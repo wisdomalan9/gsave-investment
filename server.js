@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const path = require("path");
 
 const app = express();
@@ -13,7 +14,7 @@ app.use(express.json());
 
 // 🔗 API ROUTES
 app.use("/api/user", userRoutes);
-
+app.use("/api/admin", adminRoutes);
 // 🌐 SERVE STATIC FILES
 app.use(express.static(path.join(__dirname, "public")));
 

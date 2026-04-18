@@ -1,274 +1,251 @@
-/* GLOBAL */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  }
+
 body {
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #e6f2ff, #f5fbff);
-    padding-bottom: 90px; /* prevents nav overlap */
+background: #f3f8ff;
+font-family: Arial, sans-serif;
+color: #111;
+padding-bottom: 40px;
 }
 
 /* 🔵 HEADER */
-.header {
-    background: linear-gradient(135deg, #007dff, #00c6ff);
-    color: white;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 0 0 25px 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+.top-header {
+background: linear-gradient(135deg, #007bff, #00c6ff);
+color: white;
+padding: 20px;
+border-bottom-left-radius: 25px;
+border-bottom-right-radius: 25px;
 }
 
-.logo-box {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.header-left {
+display: flex;
+align-items: center;
+gap: 12px;
 }
 
 .logo {
-    width: 45px;
+width: 48px;
+height: 48px;
+border-radius: 12px;
 }
 
-.user-box button {
-    background: white;
-    color: #007dff;
-    border: none;
-    border-radius: 10px;
-    padding: 6px 12px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-/* 💰 BALANCE */
+/* 💳 BALANCE */
 .balance-card {
-    background: linear-gradient(135deg, #00c6ff, #007dff);
-    color: white;
-    margin: -30px 15px 20px;
-    padding: 30px;
-    border-radius: 18px;
-    text-align: center;
-    box-shadow: 0 15px 40px rgba(0,125,255,0.25);
+background: rgba(255,255,255,0.18);
+backdrop-filter: blur(12px);
+margin: -25px 15px 15px;
+padding: 20px;
+border-radius: 20px;
+color: white;
+background: linear-gradient(135deg, #005eff, #00aaff);
+box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.balance-card p {
+opacity: 0.9;
 }
 
 .balance-card h1 {
-    font-size: 34px;
-    margin: 10px 0;
-    letter-spacing: 1px;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+font-size: 32px;
+margin: 10px 0;
+}
+
+.mini-balances {
+display: flex;
+justify-content: space-between;
+gap: 10px;
+margin-top: 15px;
+}
+
+.mini-balances div {
+background: rgba(255,255,255,0.15);
+padding: 10px;
+border-radius: 12px;
+width: 48%;
+}
+
+.mini-balances span {
+font-size: 12px;
+opacity: 0.8;
+}
+
+.mini-balances strong {
+display: block;
+margin-top: 5px;
 }
 
 /* ⚡ ACTIONS */
 .actions {
-    margin: 20px;
-    display: grid;
-    gap: 12px;
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 12px;
+padding: 15px;
 }
 
-.action-group {
-    display: flex;
-    gap: 10px;
+.actions button,
+.logout-btn,
+.modal-content button {
+border: none;
+padding: 14px;
+border-radius: 14px;
+background: white;
+font-weight: bold;
+box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+transition: 0.2s;
 }
 
-.actions input {
-    flex: 1;
-    padding: 14px;
-    border-radius: 12px;
-    border: none;
-    background: rgba(255,255,255,0.9);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+.actions button:active,
+.logout-btn:active,
+.modal-content button:active {
+transform: scale(0.95);
 }
 
-.actions button {
-    padding: 14px 18px;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #007dff, #00c6ff);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.actions button:active {
-    transform: scale(0.96);
-}
-
-.row {
-    display: flex;
-    gap: 10px;
-}
-
-.row button {
-    flex: 1;
-}
-
-/* 📊 STATS */
-.stats {
-    display: flex;
-    gap: 12px;
-    margin: 20px;
-}
-
-.stat-box {
-    flex: 1;
-    background: rgba(255,255,255,0.9);
-    padding: 16px;
-    border-radius: 14px;
-    text-align: center;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-}
-
-/* 💳 CARD */
+/* 📦 CARD */
 .card {
-    background: rgba(255,255,255,0.9);
-    margin: 20px;
-    padding: 18px;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+background: white;
+margin: 15px;
+padding: 15px;
+border-radius: 18px;
+box-shadow: 0 6px 20px rgba(0,0,0,0.07);
 }
 
-/* LIST */
+.card h3 {
+margin-bottom: 12px;
+}
+
+/* 📋 LISTS */
 ul {
-    list-style: none;
-    padding: 0;
+list-style: none;
 }
 
 li {
-    background: #f5faff;
-    padding: 12px;
-    border-radius: 10px;
-    margin-bottom: 10px;
+margin-bottom: 10px;
 }
 
-/* INVESTMENT CARD */
+/* 📈 INVESTMENT CARD */
 .investment-card {
-    padding: 8px;
+background: #f9fbff;
+border-radius: 14px;
+padding: 14px;
+border: 1px solid #eef3ff;
 }
 
-/* PROGRESS */
 .progress-bar {
-    width: 100%;
-    height: 6px;
-    background: #e0ecff;
-    border-radius: 10px;
-    margin-top: 6px;
+width: 100%;
+height: 8px;
+background: #e8edf7;
+border-radius: 20px;
+overflow: hidden;
+margin-top: 10px;
 }
 
 .progress {
-    height: 100%;
-    background: linear-gradient(90deg, #00c853, #00e676);
-    border-radius: 10px;
+height: 100%;
+width: 0%;
+background: linear-gradient(90deg, #00c853, #69f0ae);
+transition: width 1s linear;
 }
 
-/* SECTION */
-.section {
-    display: none;
-    opacity: 0;
-    margin: 20px;
-    transition: opacity 0.3s ease;
-margin-bottom: 100px;
-}
-/* POPUP */
+/* 🔔 POPUP */
 .popup {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #00c853;
-    color: white;
-    padding: 12px 18px;
-    border-radius: 8px;
-    opacity: 0;
-    transition: 0.3s;
+position: fixed;
+left: 50%;
+bottom: 20px;
+transform: translateX(-50%) translateY(100px);
+background: #00c853;
+color: white;
+padding: 12px 18px;
+border-radius: 30px;
+opacity: 0;
+z-index: 999;
+transition: 0.4s;
 }
 
 .popup.show {
-    opacity: 1;
+opacity: 1;
+transform: translateX(-50%) translateY(0);
 }
 
-/* RECEIPT */
+/* 🧾 RECEIPT */
 .receipt {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    opacity: 0;
-    transition: 0.3s;
+position: fixed;
+inset: 0;
+background: rgba(255,255,255,0.97);
+z-index: 1000;
+display: none;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+padding: 20px;
+text-align: center;
 }
 
 .receipt.show {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+display: flex;
 }
 
-
-/* 📱 RESPONSIVE */
-@media (min-width: 768px) {
-
-    .stats {
-        max-width: 900px;
-        margin: 20px auto;
-    }
-
-    .card {
-        max-width: 900px;
-        margin: 20px auto;
-    }
-
-    .balance-card {
-        max-width: 900px;
-        margin: -40px auto 20px;
-    }
-
-    .actions {
-        max-width: 900px;
-        margin: 20px auto;
-    }
+/* 🔲 MODAL */
+.modal {
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.45);
+z-index: 1000;
+display: flex;
+justify-content: center;
+align-items: center;
 }
 
-/* 🔻 NAV BUTTONS */
-.nav-btn {
-    flex: 1;
-    background: none;
-    border: none;
-    font-size: 20px;
-    text-align: center;
-    cursor: pointer;
+.modal.hidden {
+display: none;
 }
 
-.nav-btn.active {
-    color: #007dff;
-    transform: translateY(-3px);
+.modal-content {
+background: white;
+width: 92%;
+max-width: 400px;
+border-radius: 18px;
+padding: 20px;
+animation: pop 0.25s ease;
 }
 
-/* 🎯 INDICATOR */
-.nav-indicator {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 25%;
-    height: 4px;
-    background: linear-gradient(90deg, #007dff, #00c6ff);
-    border-radius: 10px;
-    transition: transform 0.3s ease;
+.modal-content h3 {
+margin-bottom: 15px;
 }
 
-/* 🧭 NAV FIX */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    background: white;
-    padding: 10px 0;
-    border-top: 1px solid #eee;
-    z-index: 1000;
+.modal-content input,
+.modal-content select {
+width: 100%;
+padding: 12px;
+margin-bottom: 12px;
+border-radius: 12px;
+border: 1px solid #ddd;
 }
 
-html {
-    scroll-behavior: smooth;
+@keyframes pop {
+from {
+transform: scale(0.85);
+opacity: 0;
+}
+to {
+transform: scale(1);
+opacity: 1;
+}
+}
+
+/* 🔔 LIVE FEED */
+#activityFeed li {
+background: #f8fbff;
+padding: 10px;
+border-radius: 10px;
+font-size: 14px;
+}
+
+/* 📱 MOBILE */
+@media (max-width: 480px) {
+.balance-card h1 {
+font-size: 28px;
+}
 }

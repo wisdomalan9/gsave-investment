@@ -1,698 +1,583 @@
-console.log("🔥 FINAL DASHBOARD VERSION LOADED");
+console.log("🔥 FINAL CLEAN DASHBOARD LOADED");
 
-// 🔥 FIREBASE CONFIG
+/* ===============================
+FIREBASE
+================================= */
 const firebaseConfig = {
-  apiKey: "AIzaSyCewm0z-8PA4JIvHR6WZ5QJZ1cTVfRPvXo",
-  authDomain: "g-save-investment.firebaseapp.com",
-  projectId: "g-save-investment",
-  appId: "1:223920210175:web:719631a9fa002e17a98cca"
+apiKey: "AIzaSyCewm0z-8PA4JIvHR6WZ5QJZ1cTVfRPvXo",
+authDomain: "g-save-investment.firebaseapp.com",
+projectId: "g-save-investment",
+appId: "1:223920210175:web:719631a9fa002e17a98cca"
 };
 
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
-// 🌍 GLOBAL STATE
+/* ===============================
+GLOBAL STATE
+================================= */
 let currentUser = null;
 let history = [];
 let investments = [];
+let chart = null;
 
-const plans = [
-  { id: 1, amount: 1000, return: 50000, duration: 6 * 60 * 60 * 1000 },
-  { id: 2, amount: 2000, return: 100500, duration: 12 * 60 * 60 * 1000 },
-  { id: 3, amount: 3000, return: 140000, duration: 24 * 60 * 60 * 1000 },
-  { id: 4, amount: 4000, return: 210000, duration: 2 * 24 * 60 * 60 * 1000 },
-  { id: 5, amount: 5000, return: 300000, duration: 3 * 24 * 60 * 60 * 1000 },
-  { id: 6, amount: 6000, return: 370000, duration: 4 * 24 * 60 * 60 * 1000 },
-  { id: 7, amount: 7000, return: 460000, duration: 5 * 24 * 60 * 60 * 1000 },
-  { id: 8, amount: 8000, return: 580000, duration: 6 * 24 * 60 * 60 * 1000 },
-  { id: 9, amount: 9000, return: 670000, duration: 7 * 24 * 60 * 60 * 1000 },
-  { id: 10, amount: 10000, return: 750000, duration: 7 * 24 * 60 * 60 * 1000 },
-  { id: 11, amount: 20000, return: 8300000, duration: 7 * 24 * 60 * 60 * 1000 }
+window.balance = 0;       // peso wallet
+window.cyt = 0;           // cyber token
+window.withdrawable = 0;  // ready to withdraw
+
+/* ===============================
+SETTINGS
+================================= */
+const CYT_RATE = 3000000; // ₱3,000,000 = 1 CYT
+
+const PACKAGES = [
+{id:1, peso:1000,  profit:50000,   hours:6},
+{id:2, peso:2000,  profit:100500,  hours:8},
+{id:3, peso:3000,  profit:140000,  hours:10},
+{id:4, peso:4000,  profit:210000,  hours:12},
+{id:5, peso:5000,  profit:300000,  hours:16},
+{id:6, peso:6000,  profit:370000,  hours:18},
+{id:7, peso:7000,  profit:460000,  hours:24},
+{id:8, peso:8000,  profit:580000,  hours:36},
+{id:9, peso:9000,  profit:670000,  hours:48},
+{id:10,peso:10000, profit:750000,  hours:60},
+{id:11,peso:20000, profit:8300000, hours:72}
 ];
 
-function showPopup(message, color = "#00c853") {
-    const popup = document.getElementById("popup");
-    if (!popup) return;
-
-    // reset first
-    popup.classList.remove("show");
-
-    popup.innerText = message;
-    popup.style.background = color;
-
-    setTimeout(() => {
-        popup.classList.add("show");
-    }, 10);
-
-    setTimeout(() => {
-        popup.classList.remove("show");
-    }, 3000);
+/* ===============================
+HELPERS
+================================= */
+function php(n){
+return "₱" + Number(n).toLocaleString(undefined,{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+});
 }
 
-function animateValue(id, value, prefix = "") {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    let start = 0;
-    let duration = 800;
-    let startTime = null;
-
-    function animate(currentTime) {
-        if (!startTime) startTime = currentTime;
-        let progress = Math.min((currentTime - startTime) / duration, 1);
-
-        let current = Math.floor(progress * value);
-        el.innerText = prefix + current.toLocaleString();
-
-        if (progress < 1) {
-            requestAnimationFrame(animate);
-        }
-    }
-
-    requestAnimationFrame(animate);
+function phpToCYT(v){
+return Number(v) / CYT_RATE;
 }
 
-// ✅ ADD HERE (RIGHT AFTER showPopup)
-function loadPlans() {
-    const select = document.getElementById("planSelect");
-    if (!select) return;
-
-    select.innerHTML = "";
-
-    plans.forEach(plan => {
-        const option = document.createElement("option");
-        option.value = plan.id;
-        option.textContent = `₱${plan.amount.toLocaleString()} → ₱${plan.return.toLocaleString()}`;
-        select.appendChild(option);
-    });
+function cytToPHP(v){
+return Number(v) * CYT_RATE;
 }
 
-function simulateLoading(callback) {
-    showPopup("Processing...");
-    setTimeout(callback, 1200);
+function showPopup(msg,color="#16a34a"){
+const el = document.getElementById("popup");
+if(!el) return;
+el.innerText = msg;
+el.style.background = color;
+el.classList.add("show");
+setTimeout(()=>el.classList.remove("show"),2500);
 }
 
-function showReceipt(title, details) {
-    const box = document.getElementById("receipt");
+function showReceipt(title,text){
+const wrap = document.getElementById("receipt");
+const box = document.getElementById("receiptBox");
 
-    box.innerHTML = `
-        <h3>${title}</h3>
-        <p>${details}</p>
-        <button onclick="closeReceipt()">OK</button>
-    `;
+box.innerHTML = `
 
-    box.classList.add("show");
+   <h2>${title}</h2>
+   <p style="margin:10px 0 18px;">${text}</p>
+   <button class="primary" onclick="closeReceipt()">OK</button>
+ `;
+ wrap.classList.add("show");
+}function closeReceipt(){
+document.getElementById("receipt").classList.remove("show");
 }
 
-function closeReceipt() {
-    document.getElementById("receipt").classList.remove("show");
+function closeModal(){
+document.querySelectorAll(".modal").forEach(m=>m.classList.remove("show"));
 }
 
-// 🔁 SYNC USER
-async function syncUser(firebaseUser, retries = 3) {
-    try {
-        const res = await fetch("https://gsave-investment.onrender.com/api/user/login", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                name: firebaseUser.displayName || "User",
-                email: firebaseUser.email
-            })
-        });
-
-        const data = await res.json();
-        if (!data || !data.email) throw new Error("Invalid response");
-
-        return data;
-
-    } catch (err) {
-        console.log("❌ Sync failed:", err);
-
-        if (retries > 0) return syncUser(firebaseUser, retries - 1);
-
-        showPopup("Server connection failed", "#ff3d00");
-        return null;
-    }
+function addHistory(type,details){
+history.unshift({
+type,
+details,
+time:new Date().toLocaleString()
+});
+if(history.length > 50) history.pop();
 }
 
-// 💾 SAVE USER DATA
-function saveUserData() {
-    if (!currentUser) return;
+/* ===============================
+LOAD PACKAGES
+================================= */
+function loadPlans(){
+const select = document.getElementById("planSelect");
+if(!select) return;
 
-    fetch("https://gsave-investment.onrender.com/api/user/update", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            email: currentUser.email,
-            balance: Number(window.balance || 0),
-            cyt: Number(window.cyt || 0),
-            investments: investments || [],
-            history: history || []
-        })
-    });
+select.innerHTML = "";
+
+PACKAGES.forEach(p=>{
+const option = document.createElement("option");
+option.value = p.id;
+
+const token = phpToCYT(p.peso);
+
+option.textContent =
+"${php(p.peso)} (${token.toFixed(6)} CYT) → ${php(p.profit)} / ${p.hours}h";
+
+select.appendChild(option);
+});
 }
 
-// 🔐 AUTH
-firebase.auth().onAuthStateChanged(async (user) => {
-    if (!user) {
-        window.location.href = "login.html";
-        return;
-    }
-
-    document.getElementById("userName").innerText = user.displayName || "User";
-    document.getElementById("userEmail").innerText = user.email;
-
-    const data = await syncUser(user);
-    if (!data) return;
-
-    currentUser = data;
-
-    window.balance = Number(data.balance ?? 0);
-    window.cyt = Number(data.cyt ?? 0);
-
-    investments = Array.isArray(data.investments) ? data.investments : [];
-    history = Array.isArray(data.history) ? data.history : [];
-
-updateUI();
-loadPlans();
-navigate('home', document.querySelectorAll('.nav-btn')[0]);
+/* ===============================
+SERVER SYNC
+================================= */
+async function syncUser(firebaseUser){
+try{
+const res = await fetch("/api/user/login",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({
+name:firebaseUser.displayName || "User",
+email:firebaseUser.email
+})
 });
 
-// 🔄 UI UPDATE
-function updateUI() {
-    animateValue("balance", window.balance, "₱");
-    document.getElementById("cytBalance").innerText = "CYT Balance: " + window.cyt;
+return await res.json();
 
-    displayInvestments();
-    displayHistory();
-    updateAnalytics();
-
-updateWithdrawable();
+}catch(err){
+showPopup("Server error","#dc2626");
+return null;
+}
 }
 
-// 🔓 LOGOUT
-function logout() {
-    firebase.auth().signOut().then(() => {
-        window.location.href = "login.html";
-    });
+async function saveUserData(){
+if(!currentUser) return;
+
+await fetch("/api/user/update",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({
+email:currentUser.email,
+balance:window.balance,
+cyt:window.cyt,
+withdrawable:window.withdrawable,
+investments,
+history
+})
+});
 }
 
-// 📲 REQUEST DEPOSIT (WHATSAPP ONLY)
-function requestDeposit() {
-    let amount = parseInt(document.getElementById("depositAmount").value);
+/* ===============================
+AUTH
+================================= */
+firebase.auth().onAuthStateChanged(async user=>{
 
-    if (!amount || amount < 1000) {
-        showPopup("Minimum deposit is ₱1000", "#ff3d00");
-        return;
-    }
+if(!user){
+location.href = "login.html";
+return;
+}
 
-let message =
+document.getElementById("userEmail").innerText = user.email;
+
+const data = await syncUser(user);
+if(!data) return;
+
+currentUser = data;
+
+window.balance      = Number(data.balance || 0);
+window.cyt          = Number(data.cyt || 0);
+window.withdrawable = Number(data.withdrawable || 0);
+
+history = Array.isArray(data.history) ? data.history : [];
+investments = Array.isArray(data.investments) ? data.investments : [];
+
+loadPlans();
+updateUI();
+initChart();
+});
+
+/* ===============================
+UI
+================================= */
+function updateUI(){
+
+document.getElementById("balance").innerText = php(window.balance);
+document.getElementById("cytBalance").innerText =
+"CYT Balance: " + window.cyt.toFixed(6);
+
+document.getElementById("withdrawable").innerText =
+"Withdrawable: " + php(window.withdrawable);
+
+renderInvestments();
+renderHistory();
+updateChart();
+}
+
+/* ===============================
+DEPOSIT
+================================= */
+function requestDeposit(){
+
+const amount = Number(
+document.getElementById("depositAmount").value
+);
+
+if(amount < 1000){
+showPopup("Minimum ₱1,000","#dc2626");
+return;
+}
+
+const msg =
 `G-SAVE INVESTMENT
 
 Deposit Request
-Amount: ₱${amount}
+Amount: ${php(amount)}
+Email: ${currentUser.email}`;
 
-User Email: ${currentUser.email}
+window.open(
+"https://wa.me/239167404311?text=" +
+encodeURIComponent(msg),
+"_blank"
+);
 
-Please confirm once received.`;
-    window.open(`https://wa.me/17828611696?text=${encodeURIComponent(message)}`, "_blank");
+closeModal();
+showReceipt("Request Sent","Admin will approve deposit soon.");
 }
 
-// 🪙 BUY CYT
-function buyCYT() {
-    let amount = parseInt(document.getElementById("amount").value);
+/* ===============================
+BUY TOKEN
+================================= */
+function buyCYT(){
 
-    if (!amount || amount <= 0) {
-        showPopup("Enter valid amount", "#ff3d00");
-        return;
-    }
+const amount = Number(
+document.getElementById("amount").value
+);
 
-    if (amount > window.balance) {
-        showPopup("Insufficient balance", "#ff3d00");
-        return;
-    }
-
-    let tokens = Math.floor(amount / 500);
-
-    if (tokens < 1) {
-        showPopup("Minimum is ₱500 for 1 CYT", "#ff3d00");
-        return;
-    }
-
-    simulateLoading(() => {
-        window.balance -= tokens * 500;
-        window.cyt += tokens;
-
-        addHistory("Buy CYT", `Purchased ${tokens} CYT`);
-
-        saveUserData();
-        updateUI();
-
-        showReceipt("Purchase Successful", `${tokens} CYT added`);
-    });
-} // ✅ THIS WAS MISSING
-
-// 📈 INVEST
-function invest() {
-    const selectedId = parseInt(document.getElementById("planSelect").value);
-    const plan = plans.find(p => p.id === selectedId);
-
-    if (!plan) {
-        showPopup("Invalid plan", "#ff3d00");
-        return;
-    }
-
-    if (window.balance < plan.amount) {
-        showPopup("Insufficient balance", "#ff3d00");
-        return;
-    }
-
-    simulateLoading(() => {
-
-        window.balance -= plan.amount;
-
-        const start = Date.now();
-        const end = start + plan.duration;
-
-        investments.push({
-            amount: plan.amount,
-            returnAmount: plan.return,
-            profit: plan.return - plan.amount,
-            status: "active",
-            startTime: start,
-            endTime: end
-        });
-
-        addHistory("Investment", `₱${plan.amount} → ₱${plan.return}`);
-
-        saveUserData();
-        updateUI();
-
-        showReceipt("Investment Successful", `₱${plan.amount} → ₱${plan.return}`);
-    });
+if(amount <= 0){
+showPopup("Invalid amount","#dc2626");
+return;
 }
 
-// 💸 REQUEST WITHDRAW
-function requestWithdraw(index) {
-    let inv = investments[index];
-
-    if (inv.status !== "completed") {
-        showPopup("Investment not ready", "#ff3d00");
-        return;
-    }
-
-    let totalCYT = inv.amount + inv.profit;
-    let amountPHP = totalCYT * 500;
-
-    if (amountPHP < 10000) {
-        showPopup("Minimum withdrawal is ₱10,000", "#ff3d00");
-        return;
-    }
-
-    let commission = Math.floor(amountPHP * 0.3);
-    let receive = amountPHP - commission;
-
-    let message =
-        `Hello Admin, I want to withdraw ₱${amountPHP}\n` +
-        `Commission (30%): ₱${commission}\n` +
-        `I will receive: ₱${receive}\n` +
-        `Email: ${currentUser.email}`;
-
-    window.open(`https://wa.me/17828611696?text=${encodeURIComponent(message)}`, "_blank");
+if(amount > window.balance){
+showPopup("Insufficient balance","#dc2626");
+return;
 }
 
-// 📊 INVESTMENTS DISPLAY
-function displayInvestments() {
-    const list = document.getElementById("investmentList");
-    if (!list) return;
+const token = phpToCYT(amount);
 
-list.innerHTML = "";
+setTimeout(async ()=>{
 
-if (investments.length === 0) {
-    list.innerHTML = "<p style='text-align:center;color:#888;'>No investments yet</p>";
-    return;
+window.balance -= amount;
+window.cyt += token;
+
+addHistory(
+"Buy CYT",
+"${php(amount)} → ${token.toFixed(6)} CYT"
+);
+
+await saveUserData();
+updateUI();
+closeModal();
+
+showReceipt(
+"Purchase Successful",
+token.toFixed(6) + " CYT added"
+);
+
+},1000);
 }
 
-    investments.forEach((inv, index) => {
+/* ===============================
+INVEST
+================================= */
+function invest(){
 
-        let now = Date.now();
+const id = Number(
+document.getElementById("planSelect").value
+);
 
-let remaining = inv.endTime - now;
-let totalDuration = inv.endTime - inv.startTime;
-let progress = inv.startTime    ? Math.min(((now - inv.startTime) / totalDuration) * 100, 100)    : 0;
+const pack = PACKAGES.find(x=>x.id===id);
 
-// ✅ MARK COMPLETE
-if (progress >= 100 && inv.status !== "completed") {
-    inv.status = "completed";
-    saveUserData(); // ✅ ensures persistence
-    remaining = 0;
+if(!pack) return;
+
+const tokenNeed = phpToCYT(pack.peso);
+
+if(window.cyt < tokenNeed){
+showPopup("Not enough CYT","#dc2626");
+return;
 }
 
+setTimeout(async ()=>{
 
-// ⏱️ TIME FORMAT
-let timeText = formatTime(remaining);
+window.cyt -= tokenNeed;
 
-        let li = document.createElement("li");
-let liveProfit = calculateLiveProfit(inv);
-let profitClass = liveProfit >= (inv.profit * 0.5) ? "profit-up" : "profit-down";
+const start = Date.now();
+const end   = start + (pack.hours * 60 * 60 * 1000);
 
-li.innerHTML = `
-    <div class="investment-card">
-        <h4>${inv.amount} CYT</h4>
-<p>Invested: ₱${inv.amount.toLocaleString()}</p>
-<p>Return: ₱${inv.returnAmount.toLocaleString()}</p>
-<p>Profit: ₱${inv.profit.toLocaleString()}</p>
+investments.unshift({
+id:Date.now(),
+packageId:pack.id,
+principal:pack.peso,
+profit:pack.profit,
+tokenSpent:tokenNeed,
+startTime:start,
+endTime:end,
+status:"active",
+paid:false
+});
 
-        <p style="color:${inv.status === 'completed' ? '#00c853' : '#999'};">
-            Total Value: ₱${((inv.amount + calculateLiveProfit(inv)) * 500).toLocaleString()}
-        </p>
-<p class="${profitClass}" style="font-weight:bold;">
-    Profit: ${liveProfit.toLocaleString()} CYT
-</p>
-        <p>
-            Status:
-            <span style="color:${inv.status === 'completed' ? '#00c853' : '#ff3d00'}; font-weight:bold;">
-                ${inv.status === 'completed' ? '✔ Completed' : '⏳ In Progress'}
-            </span>
-        </p>
+addHistory(
+"Investment",
+"${php(pack.peso)} package started"
+);
 
-        <!-- ⏱ COUNTDOWN -->
-        <p class="countdown">${timeText}</p>
+await saveUserData();
+updateUI();
+closeModal();
 
-        <!-- ✅ ADD HERE -->
-        <p style="font-size:12px; color:#888;">
+showReceipt(
+"Investment Started",
+"${php(pack.peso)} is now growing"
+);
 
-Ends at: ${inv.endTime ? new Date(inv.endTime).toLocaleString() : "Calculating..."}
-
-        </p>
-<p style="font-size:12px; color:#555;">
-    ${getAIMessage(inv)}
-</p>
-        <!-- 📊 PROGRESS -->
-        <div class="progress-bar">
-            <div class="progress" style="width:${progress}%"></div>
-        </div>
-
-${inv.status === "completed"
-    ? `<p style="color:green;">Ready for withdrawal</p>`
-    : ""}
-    </div>
-`;
-
-        list.appendChild(li);
-    });
+},1200);
 }
 
-function formatTime(ms) {
-    if (ms <= 0) return "Completed";
+/* ===============================
+INVESTMENTS UI
+================================= */
+function renderInvestments(){
 
-    let totalSeconds = Math.floor(ms / 1000);
+const box = document.getElementById("investmentList");
+if(!box) return;
 
-    let days = Math.floor(totalSeconds / 86400);
-    let hours = Math.floor((totalSeconds % 86400) / 3600);
-    let minutes = Math.floor((totalSeconds % 3600) / 60);
-    let seconds = totalSeconds % 60;
-
-    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+if(!investments.length){
+box.innerHTML = "<div class="item">No investments yet</div>";
+return;
 }
 
-function calculateLiveProfit(inv) {
-    if (!inv.startTime || !inv.endTime) return 0;
+box.innerHTML = "";
 
-    let now = Date.now();
+investments.forEach(inv=>{
 
-    let totalDuration = inv.endTime - inv.startTime;
-    let elapsed = now - inv.startTime;
+const now = Date.now();
+const total = inv.endTime - inv.startTime;
+const left = inv.endTime - now;
 
-    if (elapsed < 0) return 0;
-    if (elapsed > totalDuration) return inv.profit;
+let progress =
+Math.min(
+((now - inv.startTime) / total) * 100,
+100
+);
 
-    let progress = elapsed / totalDuration;
+if(progress < 0) progress = 0;
 
-    return Math.floor(inv.profit * progress);
+const liveProfit =
+(inv.profit * progress / 100);
+
+if(progress >= 100 && !inv.paid){
+
+ inv.status = "completed";
+ inv.paid = true;
+
+ window.withdrawable +=
+ inv.principal + inv.profit;
+
+ addHistory(
+   "Completed",
+   `${php(inv.principal)} package matured`
+ );
+
+ saveUserData();
+
 }
 
-// 📜 HISTORY
-function addHistory(type, details) {
-    history.unshift({
-        type,
-        details,
-        time: new Date().toLocaleString()
-    });
+const div = document.createElement("div");
+div.className = "item";
+
+div.innerHTML = `
+<strong>${php(inv.principal)} Package</strong><br>
+Status: ${inv.status}<br>
+Profit: ${php(liveProfit)}<br>
+Ends: ${new Date(inv.endTime).toLocaleString()}
+
+   <div class="progress">
+     <div class="bar" style="width:${progress}%"></div>
+   </div>
+   <small>${timeLeft(left)}</small>
+   `;box.appendChild(div);
+});
 }
 
-// 📜 DISPLAY HISTORY
-function displayHistory() {
-    const list = document.getElementById("historyList");
-    if (!list) return;
+function timeLeft(ms){
 
-list.innerHTML = "";
+if(ms <= 0) return "Completed";
 
-if (history.length === 0) {
-    list.innerHTML = "<p style='text-align:center;color:#888;'>No transactions yet</p>";
-    return;
+let s = Math.floor(ms/1000);
+let d = Math.floor(s/86400); s%=86400;
+let h = Math.floor(s/3600); s%=3600;
+let m = Math.floor(s/60); s%=60;
+
+return "${d}d ${h}h ${m}m ${s}s";
 }
 
-    history.forEach(item => {
-        let icon =
-            item.type === "Investment" ? "📈" :
-            item.type === "Buy CYT" ? "🪙" :
-            "💰";
+/* ===============================
+HISTORY
+================================= */
+function renderHistory(){
 
-        let li = document.createElement("li");
+const box = document.getElementById("historyList");
 
-        li.innerHTML = `
-            <div style="display:flex; justify-content:space-between;">
-                <div>
-                    <strong>${icon} ${item.type}</strong><br>
-                    <small>${item.details}</small>
-                </div>
-                <div>
-                    <small>${item.time}</small>
-                </div>
-            </div>
-        `;
-
-        list.appendChild(li);
-    });
+if(!history.length){
+box.innerHTML = "<div class="item">No history yet</div>";
+return;
 }
 
-// 📊 ANALYTICS
-function updateAnalytics() {
-    let totalInvested = 0;
-    let totalProfit = 0;
-    let activeCount = 0;
+box.innerHTML = "";
 
-    investments.forEach(inv => {
-        totalInvested += inv.amount;
-        totalProfit += inv.profit;
-        if (inv.status === "active") activeCount++;
-    });
+history.slice(0,15).forEach(h=>{
+box.innerHTML += `
 
-document.getElementById("totalInvested").innerText = totalInvested.toLocaleString();
-document.getElementById("totalProfit").innerText = totalProfit.toLocaleString();
-document.getElementById("activeCount").innerText = activeCount;
+   <div class="item">
+   <strong>${h.type}</strong><br>
+   ${h.details}<br>
+   <small>${h.time}</small>
+   </div>`;
+ });
+}/* ===============================
+WITHDRAW
+================================= */
+function withdrawAll(){
+
+if(window.withdrawable <= 0){
+showPopup("No withdrawable balance","#dc2626");
+return;
 }
 
-function refreshAccount() {
-    if (!firebase.auth().currentUser) return;
+const msg =
+`G-SAVE INVESTMENT
 
-    syncUser(firebase.auth().currentUser).then(data => {
-        if (!data) return;
+Withdrawal Request
+Amount: ${php(window.withdrawable)}
+Email: ${currentUser.email}`;
 
-        window.balance = Number(data.balance || 0);
-        window.cyt = Number(data.cyt || 0);
-        investments = data.investments || [];
-        history = data.history || [];
+window.open(
+"https://wa.me/239167404311?text=" +
+encodeURIComponent(msg),
+"_blank"
+);
 
-        updateUI();
-
-        showPopup("Account updated!");
-    });
-} // ✅ THIS WAS MISSING
-
-function updateWithdrawable() {
-    let total = 0;
-
-    investments.forEach(inv => {
-        if (inv.status === "completed") {
-            let totalCYT = inv.amount + inv.profit;
-            total += totalCYT * 500;
-        }
-    });
-
-    document.getElementById("withdrawable").innerText =
-        "Withdrawable: ₱" + total.toLocaleString();
+showReceipt(
+"Withdrawal Request Sent",
+"Admin will process shortly."
+);
 }
 
-function withdrawAll() {
-    let total = 0;
+/* ===============================
+LIVE FEED
+================================= */
+const names = [
+"John","Maria","Kevin","Grace","Pedro",
+"Anna","Mark","Liza","Paul","James"
+];
 
-    investments.forEach(inv => {
-        if (inv.status === "completed") {
-            let totalCYT = inv.amount + inv.profit;
-            total += totalCYT * 500;
-        }
-    });
+function fakeFeed(){
 
-    if (total <= 0) {
-        showPopup("No available balance to withdraw", "#ff3d00");
-        return;
-    }
+const box = document.getElementById("activityFeed");
+if(!box) return;
 
-    if (total < 1000) {
-        showPopup("Minimum withdrawal is ₱1000", "#ff3d00");
-        return;
-    }
+const actions = [
+"invested",
+"withdrew",
+"earned"
+];
 
-    let commission = Math.floor(total * 0.3);
-    let receive = total - commission;
+const item = document.createElement("div");
+item.className = "item";
 
-    let message =
-        `Hello Admin, I want to withdraw ₱${total.toLocaleString()}\n` +
-        `Commission (30%): ₱${commission}\n` +
-        `I will receive: ₱${receive}\n` +
-        `Email: ${currentUser.email}`;
+const name =
+names[Math.floor(Math.random()*names.length)];
 
-    window.open(`https://wa.me/17828611696?text=${encodeURIComponent(message)}`, "_blank");
+const action =
+actions[Math.floor(Math.random()*actions.length)];
 
-    // REMOVE COMPLETED INVESTMENTS
-    investments = investments.filter(inv => inv.status !== "completed");
+const amt =
+php(Math.floor(Math.random()*90000)+10000);
 
-    saveUserData();
-    updateUI();
+item.innerHTML =
+"${name} ${action} ${amt}";
+
+box.prepend(item);
+
+while(box.children.length > 6){
+box.removeChild(box.lastChild);
+}
 }
 
-function generateFakeActivity() {
-    const names = [
-        "John", "Sarah", "Michael", "David", "Grace", "Daniel"
-    ];
+setInterval(fakeFeed,4000);
 
-    const actions = [
-        { text: "invested", icon: "📈" },
-        { text: "withdrew", icon: "💸" },
-        { text: "earned", icon: "💰" }
-    ];
+/* ===============================
+CHART
+================================= */
+function initChart(){
 
-    const amounts = [10000, 20000, 50000, 75000, 120000];
+const ctx =
+document.getElementById("profitChart");
 
-    let name = names[Math.floor(Math.random() * names.length)];
-    let action = actions[Math.floor(Math.random() * actions.length)];
-    let amount = amounts[Math.floor(Math.random() * amounts.length)];
+if(!ctx) return;
 
-    return `${action.icon} ${name} ${action.text} ₱${amount.toLocaleString()}`;
+chart = new Chart(ctx,{
+type:"line",
+data:{
+labels:[],
+datasets:[{
+data:[],
+borderColor:"#007dff",
+backgroundColor:"rgba(0,125,255,.15)",
+fill:true,
+tension:.4
+}]
+},
+options:{
+responsive:true,
+plugins:{legend:{display:false}},
+scales:{
+x:{display:false},
+y:{display:false}
+}
+}
+});
 }
 
-// 🔁 AUTO REFRESH
-setInterval(() => {
-    updateWithdrawable();
-    updateAnalytics();
-}, 3000); // every 3 seconds
+function updateChart(){
 
-setInterval(() => {
-    displayInvestments();
-}, 3000); // keep smooth animation
+if(!chart) return;
 
-setInterval(() => {
-    const feed = document.getElementById("activityFeed");
-    if (!feed) return;
+let total = 0;
 
-    let li = document.createElement("li");
-    li.innerText = generateFakeActivity();
+investments.forEach(inv=>{
 
-feed.prepend(li);
+const now = Date.now();
+const totalMs = inv.endTime - inv.startTime;
 
-// trigger animation
-setTimeout(() => {
-    li.classList.add("show");
-}, 50);
+let progress =
+Math.min(
+((now - inv.startTime)/totalMs)*100,
+100
+);
 
-    if (feed.children.length > 5) {
-        feed.removeChild(feed.lastChild);
-    }
-}, 4000);
+if(progress < 0) progress = 0;
 
-let chart;
+total += inv.profit * progress / 100;
+});
 
-function initChart() {
-    const ctx = document.getElementById("profitChart");
-    if (!ctx) return;
+chart.data.labels.push("");
+chart.data.datasets[0].data.push(total);
 
-    chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Profit',
-                data: [],
-borderColor: '#00c853',
-backgroundColor: 'rgba(0,200,83,0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                x: { display: false },
-                y: { display: true }
-            }
-        }
-    });
+if(chart.data.labels.length > 12){
+chart.data.labels.shift();
+chart.data.datasets[0].data.shift();
 }
 
-function updateChart() {
-    if (!chart) return;
-
-    let totalProfit = 0;
-
-    investments.forEach(inv => {
-        totalProfit += calculateLiveProfit(inv);
-    });
-
-    let time = new Date().toLocaleTimeString();
-
-    chart.data.labels.push(time);
-    chart.data.datasets[0].data.push(totalProfit);
-
-    if (chart.data.labels.length > 10) {
-        chart.data.labels.shift();
-        chart.data.datasets[0].data.shift();
-}
-    chart.update();
+chart.update();
 }
 
-// INIT
-setTimeout(initChart, 1000);
-
-// AUTO UPDATE
-setInterval(updateChart, 3000);
-
-function simulateMarketGrowth() {
-    investments.forEach(inv => {
-        if (inv.status === "active") {
-            // small random boost (AI feel)
-            let boost = Math.random() * 0.02; // 2%
-
-            inv.profit += Math.floor(inv.profit * boost);
-        }
-    });
-
-    updateUI();
-}
-setInterval(simulateMarketGrowth, 5000);
-
-function getAIMessage(inv) {
-    if (inv.status === "completed") return "✅ AI: Investment completed successfully";
-    
-    let progress = (Date.now() - inv.startTime) / (inv.endTime - inv.startTime);
-
-    if (progress < 0.3) return "🧠 AI: Market just opened...";
-    if (progress < 0.7) return "📈 AI: Profit increasing steadily...";
-    return "🚀 AI: Near completion...";
-}
-
+/* ===============================
+AUTO LOOP
+================================= */
+setInterval(async ()=>{
+updateUI();
+await saveUserData();
+},3000);
