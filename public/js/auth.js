@@ -1,58 +1,158 @@
+// FINAL auth.js
+// Firebase Google Login (Popup + Redirect Fallback)
+
+console.log("✅ FINAL AUTH LOADED");
+
+/* ===================================
+   FIREBASE CONFIG
+=================================== */
 const firebaseConfig = {
   apiKey: "AIzaSyCewm0z-8PA4JIvHR6WZ5QJZ1cTVfRPvXo",
-  authDomain: "g-save-investment.firebaseapp.com", // ✅ FIXED
+  authDomain: "g-save-investment.firebaseapp.com",
   projectId: "g-save-investment",
   appId: "1:223920210175:web:719631a9fa002e17a98cca"
 };
 
 if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+  firebase.initializeApp(firebaseConfig);
 }
 
-// 🔐 GOOGLE LOGIN
-function googleLogin() {
-    const provider = new firebase.auth.GoogleAuthProvider();
+/* ===================================
+   HELPERS
+=================================== */
+function setLoginLoading(state){
 
-    provider.setCustomParameters({
-        prompt: "select_account"
-    });
+  const btn = document.querySelector(".google-btn");
 
-    firebase.auth().signInWithPopup(provider)
-    .then((result) => {
-        console.log("✅ Login success:", result.user.email);
-    })
-    .catch((error) => {
-        console.log("❌ Popup failed, switching to redirect:", error);
+  if(!btn) return;
 
-        // fallback for mobile
-        firebase.auth().signInWithRedirect(provider);
-    });
+  if(state){
+    btn.disabled = true;
+    btn.innerText = "Signing in...";
+    btn.style.opacity = "0.7";
+  }else{
+    btn.disabled = false;
+    btn.innerText = "Continue with Google";
+    btn.style.opacity = "1";
+  }
 }
 
-// 🔁 REDIRECT RESULT
-firebase.auth().getRedirectResult()
-.then((result) => {
-    if (result.user) {
-        console.log("✅ Redirect login success:", result.user.email);
-    }
+function showMsg(msg){
+  console.log(msg);
+}
+
+/* ===================================
+   GOOGLE LOGIN
+=================================== */
+function googleLogin(){
+
+  const provider =
+    new firebase.auth.GoogleAuthProvider();
+
+  provider.setCustomParameters({
+    prompt:"select_account"
+  });
+
+  setLoginLoading(true);
+
+  firebase.auth()
+  .signInWithPopup(provider)
+
+  .then(result=>{
+    showMsg("✅ Popup login success");
+  })
+
+  .catch(error=>{
+
+    console.log("Popup failed:", error.code);
+
+    // Mobile fallback
+    firebase.auth()
+    .signInWithRedirect(provider);
+  })
+
+  .finally(()=>{
+    setLoginLoading(false);
+  });
+}
+
+/* ===================================
+   REDIRECT RESULT
+=================================== */
+firebase.auth()
+.getRedirectResult()
+
+.then(result=>{
+
+  if(result.user){
+    console.log(
+      "✅ Redirect login success:",
+      result.user.email
+    );
+  }
+
 })
-.catch((error) => {
-    console.log("Redirect error:", error);
+
+.catch(error=>{
+  console.log(
+    "Redirect error:",
+    error.message
+  );
 });
 
-// 🔁 AUTH STATE
-firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-        console.log("User logged in:", user.email);
-        window.location.href = "dashboard.html";
-    } else {
-        console.log("No user logged in");
+/* ===================================
+   AUTH STATE
+=================================== */
+firebase.auth()
+.onAuthStateChanged(user=>{
+
+  const page =
+    window.location.pathname
+    .split("/")
+    .pop();
+
+  if(user){
+
+    console.log(
+      "Logged in:",
+      user.email
+    );
+
+    // Only redirect if on login page
+    if(
+      page === "login.html" ||
+      page === ""
+    ){
+      window.location.href =
+        "dashboard.html";
     }
+
+  }else{
+
+    console.log("No user");
+
+    // If on dashboard without login
+    if(page === "dashboard.html"){
+      window.location.href =
+        "login.html";
+    }
+  }
 });
 
-// 🔓 LOGOUT
-function logout() {
-    firebase.auth().signOut().then(() => {
-        window.location.href = "login.html";
-    });
+/* ===================================
+   LOGOUT
+=================================== */
+function logout(){
+
+  firebase.auth()
+  .signOut()
+
+  .then(()=>{
+    window.location.href =
+      "login.html";
+  })
+
+  .catch(()=>{
+    alert("Logout failed");
+  });
 }
