@@ -1,19 +1,50 @@
-// FILE 5: routes/adminRoutes.js
+// FINAL SECURITY PATCHES
+// Apply these upgrades safely
+
+/* =====================================================
+   FILE: routes/adminRoutes.js
+   Replace entire file
+===================================================== */
 
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 
 /* ===================================
-   SIMPLE ADMIN AUTH
+   ENV ADMIN PASSWORD
 =================================== */
-router.use((req, res, next) => {
-  const auth = req.headers.authorization;
+const ADMIN_PASS =
+process.env.ADMIN_PASS || "admin123";
 
-  if (auth !== "admin123") {
+/* ===================================
+   SAFE USER RESPONSE
+=================================== */
+function cleanUser(user){
+  return {
+    name: user.name || "User",
+    email: user.email,
+    balance: Number(user.balance || 0),
+    cyt: Number(user.cyt || 0),
+    withdrawable: Number(user.withdrawable || 0),
+    investments: Array.isArray(user.investments)
+      ? user.investments.length
+      : 0,
+    createdAt: user.createdAt || null
+  };
+}
+
+/* ===================================
+   ADMIN AUTH
+=================================== */
+router.use((req,res,next)=>{
+
+  const auth =
+    req.headers.authorization;
+
+  if(auth !== ADMIN_PASS){
     return res.status(403).json({
-      success: false,
-      msg: "Unauthorized"
+      success:false,
+      msg:"Unauthorized"
     });
   }
 
@@ -21,130 +52,152 @@ router.use((req, res, next) => {
 });
 
 /* ===================================
-   GET ALL USERS
+   GET USERS
 =================================== */
-router.get("/users", async (req, res) => {
-  try {
+router.get("/users", async(req,res)=>{
+
+  try{
+
     const users = await User.find()
-      .sort({ createdAt: -1 });
+      .sort({createdAt:-1});
 
-    res.json(users);
+    res.json(
+      users.map(cleanUser)
+    );
 
-  } catch (err) {
+  }catch(err){
     res.status(500).json({
-      success: false,
-      msg: "Failed to load users"
+      success:false,
+      msg:"Failed to load users"
     });
   }
 });
 
 /* ===================================
-   APPROVE DEPOSIT
-   Adds money to wallet balance
+   CREDIT USER
 =================================== */
-router.post("/credit", async (req, res) => {
-  try {
-    const { email, amount } = req.body;
+router.post("/credit", async(req,res)=>{
 
-    const user = await User.findOne({ email });
+  try{
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        msg: "User not found"
+    const { email, amount } =
+      req.body;
+
+    const add =
+      Number(amount || 0);
+
+    if(!email || add <= 0){
+      return res.status(400).json({
+        success:false,
+        msg:"Invalid request"
       });
     }
 
-    const add = Number(amount || 0);
+    const user =
+      await User.findOne({email});
 
-    if (add <= 0) {
-      return res.status(400).json({
-        success: false,
-        msg: "Invalid amount"
+    if(!user){
+      return res.status(404).json({
+        success:false,
+        msg:"User not found"
       });
     }
 
     user.balance =
       Number(user.balance || 0) + add;
 
-    user.history = user.history || [];
+    user.history =
+      Array.isArray(user.history)
+      ? user.history
+      : [];
 
     user.history.unshift({
-      type: "Admin Deposit",
-      details: `₱${add.toLocaleString()} credited`,
-      time: new Date().toLocaleString()
+      type:"Admin Deposit",
+      details:`₱${add.toLocaleString()} credited`,
+      time:new Date().toLocaleString()
     });
 
     await user.save();
 
     res.json({
-      success: true,
-      msg: "Deposit Approved Successfully"
+      success:true,
+      msg:"Deposit Approved"
     });
 
-  } catch (err) {
+  }catch(err){
     res.status(500).json({
-      success: false,
-      msg: "Deposit failed"
+      success:false,
+      msg:"Deposit failed"
     });
   }
 });
 
 /* ===================================
-   PROCESS WITHDRAWAL
-   Deducts from withdrawable balance
+   WITHDRAW USER
 =================================== */
-router.post("/withdraw", async (req, res) => {
-  try {
-    const { email, amount } = req.body;
+router.post("/withdraw", async(req,res)=>{
 
-    const user = await User.findOne({ email });
+  try{
 
-    if (!user) {
+    const { email, amount } =
+      req.body;
+
+    const take =
+      Number(amount || 0);
+
+    if(!email || take <= 0){
+      return res.status(400).json({
+        success:false,
+        msg:"Invalid request"
+      });
+    }
+
+    const user =
+      await User.findOne({email});
+
+    if(!user){
       return res.status(404).json({
-        success: false,
-        msg: "User not found"
+        success:false,
+        msg:"User not found"
       });
     }
 
-    const take = Number(amount || 0);
-
-    if (take <= 0) {
+    if(
+      Number(user.withdrawable || 0)
+      < take
+    ){
       return res.status(400).json({
-        success: false,
-        msg: "Invalid amount"
-      });
-    }
-
-    if (Number(user.withdrawable || 0) < take) {
-      return res.status(400).json({
-        success: false,
-        msg: "Insufficient withdrawable balance"
+        success:false,
+        msg:"Insufficient balance"
       });
     }
 
     user.withdrawable =
-      Number(user.withdrawable || 0) - take;
+      Number(user.withdrawable || 0)
+      - take;
 
-    user.history = user.history || [];
+    user.history =
+      Array.isArray(user.history)
+      ? user.history
+      : [];
 
     user.history.unshift({
-      type: "Admin Withdrawal",
-      details: `₱${take.toLocaleString()} paid out`,
-      time: new Date().toLocaleString()
+      type:"Admin Withdrawal",
+      details:`₱${take.toLocaleString()} paid`,
+      time:new Date().toLocaleString()
     });
 
     await user.save();
 
     res.json({
-      success: true,
-      msg: "Withdrawal Approved"
+      success:true,
+      msg:"Withdrawal Approved"
     });
 
-  } catch (err) {
+  }catch(err){
     res.status(500).json({
-      success: false,
-      msg: "Withdrawal failed"
+      success:false,
+      msg:"Withdrawal failed"
     });
   }
 });
@@ -152,30 +205,30 @@ router.post("/withdraw", async (req, res) => {
 /* ===================================
    DELETE USER
 =================================== */
-router.post("/delete", async (req, res) => {
-  try {
+router.post("/delete", async(req,res)=>{
+
+  try{
+
     const { email } = req.body;
 
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        msg: "User not found"
+    if(!email){
+      return res.status(400).json({
+        success:false,
+        msg:"Email required"
       });
     }
 
-    await User.deleteOne({ email });
+    await User.deleteOne({email});
 
     res.json({
-      success: true,
-      msg: "User Deleted"
+      success:true,
+      msg:"User Deleted"
     });
 
-  } catch (err) {
+  }catch(err){
     res.status(500).json({
-      success: false,
-      msg: "Delete failed"
+      success:false,
+      msg:"Delete failed"
     });
   }
 });
