@@ -1,7 +1,7 @@
-// MERGED FINAL dashboard.js
-// Premium Features + Firebase Frontend + Render Backend
+// FINAL PREMIUM dashboard.js
+// Firebase + Render + Premium Features Safe Build
 
-console.log("✅ FINAL MERGED DASHBOARD LOADED");
+console.log("✅ PREMIUM DASHBOARD LOADED");
 
 /* ===================================
    FIREBASE
@@ -13,17 +13,16 @@ const firebaseConfig = {
   appId: "1:223920210175:web:719631a9fa002e17a98cca"
 };
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
 /* ===================================
-   BACKEND API (Render)
+   API
 =================================== */
-const API_BASE = "https://gsave-investment.onrender.com";
+const API =
+"https://gsave-investment.onrender.com/api/user";
 
 /* ===================================
-   GLOBAL STATE
+   STATE
 =================================== */
 let currentUser = null;
 let balance = 0;
@@ -40,468 +39,403 @@ let chart = null;
 const CYT_RATE = 3000000;
 
 const PACKAGES = [
-  { id:1, peso:1000, profit:50000, hours:6 },
-  { id:2, peso:2000, profit:100500, hours:8 },
-  { id:3, peso:3000, profit:140000, hours:10 },
-  { id:4, peso:4000, profit:210000, hours:12 },
-  { id:5, peso:5000, profit:300000, hours:16 },
-  { id:6, peso:6000, profit:370000, hours:18 },
-  { id:7, peso:7000, profit:460000, hours:24 },
-  { id:8, peso:8000, profit:580000, hours:36 },
-  { id:9, peso:9000, profit:670000, hours:48 },
-  { id:10, peso:10000, profit:750000, hours:60 },
-  { id:11, peso:20000, profit:8300000, hours:72 }
+{id:1,peso:1000,profit:50000,hours:6},
+{id:2,peso:2000,profit:100500,hours:8},
+{id:3,peso:3000,profit:140000,hours:10},
+{id:4,peso:4000,profit:210000,hours:12},
+{id:5,peso:5000,profit:300000,hours:16},
+{id:6,peso:6000,profit:370000,hours:18},
+{id:7,peso:7000,profit:460000,hours:24},
+{id:8,peso:8000,profit:580000,hours:36},
+{id:9,peso:9000,profit:670000,hours:48},
+{id:10,peso:10000,profit:750000,hours:60},
+{id:11,peso:20000,profit:8300000,hours:72}
 ];
 
 /* ===================================
    HELPERS
 =================================== */
 function php(v){
-  return "₱" + Number(v).toLocaleString(undefined,{
-    minimumFractionDigits:2,
-    maximumFractionDigits:2
-  });
+ return "₱" + Number(v).toLocaleString(undefined,{
+  minimumFractionDigits:2,
+  maximumFractionDigits:2
+ });
 }
 
 function phpToCYT(v){
-  return Number(v) / CYT_RATE;
+ return Number(v)/CYT_RATE;
 }
 
-function showPopup(msg,color="#16a34a"){
-  const el = document.getElementById("popup");
-  if(!el) return;
-
-  el.innerText = msg;
-  el.style.background = color;
-  el.classList.add("show");
-
-  setTimeout(()=>{
-    el.classList.remove("show");
-  },2500);
+function popup(msg,color="#16a34a"){
+ const el=document.getElementById("popup");
+ if(!el) return;
+ el.innerText=msg;
+ el.style.background=color;
+ el.classList.add("show");
+ setTimeout(()=>el.classList.remove("show"),2500);
 }
 
-function showReceipt(title,msg){
-  const wrap = document.getElementById("receipt");
-  const box = document.getElementById("receiptBox");
-
-  if(!wrap || !box) return;
-
-  box.innerHTML = `
-    <h2>${title}</h2>
-    <p style="margin:12px 0 18px;">${msg}</p>
-    <button class="primary-btn" onclick="closeReceipt()">OK</button>
-  `;
-
-  wrap.classList.remove("hidden");
-}
-
-function closeReceipt(){
-  const wrap = document.getElementById("receipt");
-  if(wrap) wrap.classList.add("hidden");
+function receipt(title,msg){
+ const box=document.getElementById("receiptBox");
+ const wrap=document.getElementById("receipt");
+ box.innerHTML=`
+ <h2>${title}</h2>
+ <p style="margin:12px 0 20px;">${msg}</p>
+ <button class="primary-btn" onclick="closeReceipt()">OK</button>`;
+ wrap.classList.remove("hidden");
 }
 
 function addHistory(type,details){
-  historyData.unshift({
-    type,
-    details,
-    time:new Date().toLocaleString()
-  });
-
-  if(historyData.length > 50){
-    historyData.pop();
-  }
+ historyData.unshift({
+  type,details,
+  time:new Date().toLocaleString()
+ });
+ if(historyData.length>50) historyData.pop();
 }
 
 function timeLeft(ms){
-  if(ms <= 0) return "Completed";
-
-  let sec = Math.floor(ms/1000);
-  let d = Math.floor(sec/86400); sec%=86400;
-  let h = Math.floor(sec/3600); sec%=3600;
-  let m = Math.floor(sec/60); sec%=60;
-
-  return `${d}d ${h}h ${m}m ${sec}s`;
+ if(ms<=0) return "Completed";
+ let s=Math.floor(ms/1000);
+ let d=Math.floor(s/86400); s%=86400;
+ let h=Math.floor(s/3600); s%=3600;
+ let m=Math.floor(s/60); s%=60;
+ return `${d}d ${h}h ${m}m ${s}s`;
 }
 
 /* ===================================
-   SERVER
+   API
 =================================== */
 async function syncUser(user){
-  try{
-    const res = await fetch(API_BASE + "/api/user/login",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        name:user.displayName || "User",
-        email:user.email
-      })
-    });
-
-    return await res.json();
-
-  }catch(err){
-    showPopup("Backend unavailable","#dc2626");
-    return null;
-  }
+ try{
+ const res=await fetch(API+"/login",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+   name:user.displayName||"User",
+   email:user.email
+  })
+ });
+ return await res.json();
+ }catch(err){
+  popup("Server error","#dc2626");
+  return null;
+ }
 }
 
-async function saveUserData(){
-
-  if(!currentUser) return;
-
-  try{
-    await fetch(API_BASE + "/api/user/update",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        email:currentUser.email,
-        balance,
-        cyt,
-        withdrawable,
-        history:historyData,
-        investments
-      })
-    });
-
-  }catch(err){
-    console.log("Save failed");
-  }
+async function saveUser(){
+ if(!currentUser) return;
+ try{
+ await fetch(API+"/update",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+   email:currentUser.email,
+   balance,
+   cyt,
+   withdrawable,
+   investments,
+   history:historyData
+  })
+ });
+ }catch(err){}
 }
 
 /* ===================================
    AUTH
 =================================== */
 firebase.auth().onAuthStateChanged(async user=>{
+ if(!user){
+  location.href="login.html";
+  return;
+ }
 
-  if(!user){
-    location.href = "login.html";
-    return;
-  }
+ document.getElementById("userEmail").innerText=user.email;
 
-  document.getElementById("userEmail").innerText = user.email;
+ const data=await syncUser(user);
+ if(!data) return;
 
-  const data = await syncUser(user);
+ currentUser=data;
+ balance=Number(data.balance||0);
+ cyt=Number(data.cyt||0);
+ withdrawable=Number(data.withdrawable||0);
+ historyData=Array.isArray(data.history)?data.history:[];
+ investments=Array.isArray(data.investments)?data.investments:[];
 
-  if(!data) return;
-
-  currentUser = data;
-
-  balance = Number(data.balance || 0);
-  cyt = Number(data.cyt || 0);
-  withdrawable = Number(data.withdrawable || 0);
-
-  historyData = Array.isArray(data.history) ? data.history : [];
-  investments = Array.isArray(data.investments) ? data.investments : [];
-
-  loadPlans();
-  updateUI();
-  initChart();
+ loadPlans();
+ updateUI();
+ initChart();
 });
 
 /* ===================================
    UI
 =================================== */
 function updateUI(){
+ document.getElementById("balance").innerText=php(balance);
+ document.getElementById("cytBalance").innerText=cyt.toFixed(6);
+ document.getElementById("withdrawable").innerText=php(withdrawable);
 
-  document.getElementById("balance").innerText = php(balance);
-  document.getElementById("cytBalance").innerText = cyt.toFixed(6);
-  document.getElementById("withdrawable").innerText = php(withdrawable);
-
-  renderHistory();
-  renderInvestments();
-  updateChart();
+ renderHistory();
+ renderInvestments();
+ updateChart();
 }
 
 function renderHistory(){
+ const box=document.getElementById("historyList");
 
-  const box = document.getElementById("historyList");
+ if(!historyData.length){
+  box.innerHTML=`<div class="empty">No transactions yet</div>`;
+  return;
+ }
 
-  if(!box) return;
+ box.innerHTML="";
 
-  if(!historyData.length){
-    box.innerHTML = `<div class="empty">No history yet</div>`;
-    return;
-  }
-
-  box.innerHTML = "";
-
-  historyData.slice(0,15).forEach(item=>{
-    box.innerHTML += `
-      <div class="list-item">
-        <strong>${item.type}</strong><br>
-        ${item.details}<br>
-        <small>${item.time}</small>
-      </div>
-    `;
-  });
+ historyData.slice(0,15).forEach(h=>{
+ box.innerHTML+=`
+ <div class="list-item">
+ <strong>${h.type}</strong><br>
+ ${h.details}<br>
+ <small>${h.time}</small>
+ </div>`;
+ });
 }
 
 function renderInvestments(){
+ const box=document.getElementById("investmentList");
 
-  const box = document.getElementById("investmentList");
+ if(!investments.length){
+  box.innerHTML=`<div class="empty">No investments yet</div>`;
+  return;
+ }
 
-  if(!box) return;
+ box.innerHTML="";
 
-  if(!investments.length){
-    box.innerHTML = `<div class="empty">No investments yet</div>`;
-    return;
-  }
+ investments.forEach(inv=>{
 
-  box.innerHTML = "";
+ const now=Date.now();
+ const total=inv.endTime-inv.startTime;
+ const left=inv.endTime-now;
 
-  investments.forEach(inv=>{
+ let progress=Math.min(
+ ((now-inv.startTime)/total)*100,
+ 100
+ );
 
-    const now = Date.now();
-    const total = inv.endTime - inv.startTime;
-    const left = inv.endTime - now;
+ if(progress<0) progress=0;
 
-    let progress =
-      Math.min(((now - inv.startTime)/total)*100,100);
+ const liveProfit=
+ inv.profit*(progress/100);
 
-    if(progress < 0) progress = 0;
+ if(progress>=100 && !inv.paid){
 
-    const live = inv.profit * (progress/100);
+  inv.paid=true;
+  inv.status="completed";
 
-    if(progress >= 100 && !inv.paid){
+  withdrawable +=
+   inv.principal + inv.profit;
 
-      inv.paid = true;
-      inv.status = "completed";
+  addHistory(
+   "Completed",
+   `${php(inv.principal)} matured`
+  );
 
-      withdrawable += inv.principal + inv.profit;
+  saveUser();
 
-      addHistory(
-        "Completed",
-        `${php(inv.principal)} matured`
-      );
+  if(navigator.vibrate)
+   navigator.vibrate(300);
 
-      saveUserData();
-    }
+  popup("Investment Completed");
+ }
 
-    box.innerHTML += `
-      <div class="list-item">
-        <strong>${php(inv.principal)} Package</strong><br>
-        Status: ${inv.status}<br>
-        Profit: ${php(live)}<br>
+ box.innerHTML += `
+ <div class="list-item">
+ <strong>${php(inv.principal)} Package</strong><br>
+ Status: ${inv.status}<br>
+ Live Profit: ${php(liveProfit)}<br>
 
-        <div class="progress-wrap">
-          <div class="progress-bar"
-          style="width:${progress}%"></div>
-        </div>
+ <div class="progress-wrap">
+ <div class="progress-bar"
+ style="width:${progress}%"></div>
+ </div>
 
-        <small>${timeLeft(left)}</small>
-      </div>
-    `;
-  });
+ <small>${timeLeft(left)}</small>
+ </div>
+ `;
+ });
 }
 
 /* ===================================
-   LOAD PLANS
+   PLANS
 =================================== */
 function loadPlans(){
+ const select=document.getElementById("planSelect");
+ select.innerHTML="";
 
-  const select = document.getElementById("planSelect");
-  if(!select) return;
-
-  select.innerHTML = "";
-
-  PACKAGES.forEach(p=>{
-
-    const need = phpToCYT(p.peso);
-
-    select.innerHTML += `
-      <option value="${p.id}">
-        ${php(p.peso)} (${need.toFixed(6)} CYT)
-        → ${php(p.profit)} / ${p.hours}h
-      </option>
-    `;
-  });
+ PACKAGES.forEach(p=>{
+ const opt=document.createElement("option");
+ opt.value=p.id;
+ opt.textContent=
+ `${php(p.peso)} → ${php(p.profit)} / ${p.hours}h`;
+ select.appendChild(opt);
+ });
 }
 
 /* ===================================
    ACTIONS
 =================================== */
 function requestDeposit(){
+ const amount=Number(
+ document.getElementById("depositAmount").value
+ );
 
-  const amount = Number(
-    document.getElementById("depositAmount").value
-  );
+ if(amount<1000){
+  popup("Minimum ₱1,000","#dc2626");
+  return;
+ }
 
-  if(amount < 1000){
-    showPopup("Minimum ₱1,000","#dc2626");
-    return;
-  }
+ const msg=`G-SAVE INVESTMENT
 
-  const msg =
-`Deposit Request
+Deposit Request
 Amount: ${php(amount)}
 Email: ${currentUser.email}`;
 
-  window.open(
-    "https://wa.me/2349167404311?text=" +
-    encodeURIComponent(msg),
-    "_blank"
-  );
+ window.open(
+ "https://wa.me/2349167404311?text="+
+ encodeURIComponent(msg),
+ "_blank"
+ );
 
-  showReceipt(
-    "Request Sent",
-    "Admin will approve deposit soon."
-  );
+ receipt("Request Sent","Admin will approve soon.");
 }
 
-async function buyCYT(){
+function buyCYT(){
 
-  const amount = Number(
-    document.getElementById("buyAmount").value
-  );
+ const amount=Number(
+ document.getElementById("buyAmount").value
+ );
 
-  if(amount <= 0 || amount > balance){
-    showPopup("Invalid amount","#dc2626");
-    return;
-  }
+ if(amount<=0 || amount>balance){
+  popup("Invalid amount","#dc2626");
+  return;
+ }
 
-  showPopup("Processing...");
+ const token=phpToCYT(amount);
 
-  setTimeout(async()=>{
+ balance -= amount;
+ cyt += token;
 
-    balance -= amount;
-    const token = phpToCYT(amount);
-    cyt += token;
+ addHistory(
+ "Buy CYT",
+ `${php(amount)} → ${token.toFixed(6)} CYT`
+ );
 
-    addHistory(
-      "Buy CYT",
-      `${php(amount)} → ${token.toFixed(6)} CYT`
-    );
+ saveUser();
+ updateUI();
 
-    await saveUserData();
-    updateUI();
-
-    showReceipt(
-      "Purchase Successful",
-      `${token.toFixed(6)} CYT added`
-    );
-
-  },1200);
+ popup("CYT Purchased");
 }
 
-async function invest(){
+function invest(){
 
-  const id = Number(
-    document.getElementById("planSelect").value
-  );
+ const id=Number(
+ document.getElementById("planSelect").value
+ );
 
-  const pack =
-    PACKAGES.find(x=>x.id===id);
+ const pack=PACKAGES.find(x=>x.id===id);
+ if(!pack) return;
 
-  if(!pack) return;
+ const need=phpToCYT(pack.peso);
 
-  const need = phpToCYT(pack.peso);
+ if(cyt<need){
+  popup("Not enough CYT","#dc2626");
+  return;
+ }
 
-  if(cyt < need){
-    showPopup("Not enough CYT","#dc2626");
-    return;
-  }
+ cyt -= need;
 
-  showPopup("Starting investment...");
+ const start=Date.now();
+ const end=start + (pack.hours*60*60*1000);
 
-  setTimeout(async()=>{
+ investments.unshift({
+  id:Date.now(),
+  principal:pack.peso,
+  profit:pack.profit,
+  startTime:start,
+  endTime:end,
+  status:"active",
+  paid:false
+ });
 
-    cyt -= need;
+ addHistory(
+ "Investment",
+ `${php(pack.peso)} package started`
+ );
 
-    const start = Date.now();
-    const end =
-      start + (pack.hours * 60 * 60 * 1000);
+ saveUser();
+ updateUI();
 
-    investments.unshift({
-      id:Date.now(),
-      principal:pack.peso,
-      profit:pack.profit,
-      startTime:start,
-      endTime:end,
-      status:"active",
-      paid:false
-    });
-
-    addHistory(
-      "Investment",
-      `${php(pack.peso)} started`
-    );
-
-    await saveUserData();
-    updateUI();
-
-    showReceipt(
-      "Investment Started",
-      `${php(pack.peso)} countdown active`
-    );
-
-  },1500);
+ popup("Investment Started");
 }
 
 function withdrawAll(){
 
-  if(withdrawable <= 0){
-    showPopup("No withdrawable funds","#dc2626");
-    return;
-  }
+ if(withdrawable<=0){
+  popup("No withdrawable","#dc2626");
+  return;
+ }
 
-  const msg =
-`Withdrawal Request
+ const msg=`G-SAVE INVESTMENT
+
+Withdrawal Request
 Amount: ${php(withdrawable)}
 Email: ${currentUser.email}`;
 
-  window.open(
-    "https://wa.me/2349167404311?text=" +
-    encodeURIComponent(msg),
-    "_blank"
-  );
+ window.open(
+ "https://wa.me/2349167404311?text="+
+ encodeURIComponent(msg),
+ "_blank"
+ );
 
-  showReceipt(
-    "Withdrawal Sent",
-    "Admin will process shortly."
-  );
+ receipt("Withdrawal Sent","Admin processing.");
+}
+
+function logout(){
+ firebase.auth().signOut().then(()=>{
+  location.href="login.html";
+ });
 }
 
 /* ===================================
    LIVE FEED
 =================================== */
-const feedNames = [
-  "John","Maria","Grace","Kevin",
-  "Anna","Pedro","James","Mark"
+const names=[
+"John","Grace","Kevin","Pedro",
+"Anna","James","Mark","Liza"
 ];
 
-function generateFeed(){
+function feed(){
+ const box=document.getElementById("activityFeed");
+ if(!box) return;
 
-  const box = document.getElementById("activityFeed");
-  if(!box) return;
+ const acts=["invested","earned","withdrew"];
 
-  const actions = [
-    "invested",
-    "withdrew",
-    "earned"
-  ];
+ const name=
+ names[Math.floor(Math.random()*names.length)];
 
-  const name =
-    feedNames[Math.floor(Math.random()*feedNames.length)];
+ const act=
+ acts[Math.floor(Math.random()*acts.length)];
 
-  const act =
-    actions[Math.floor(Math.random()*actions.length)];
+ const amt=
+ php(Math.floor(Math.random()*90000)+10000);
 
-  const amount =
-    php(Math.floor(Math.random()*90000)+10000);
+ const item=document.createElement("div");
+ item.className="list-item";
+ item.innerText=`${name} ${act} ${amt}`;
 
-  const item = document.createElement("div");
-  item.className = "list-item";
-  item.innerText = `${name} ${act} ${amount}`;
+ box.prepend(item);
 
-  box.prepend(item);
-
-  while(box.children.length > 6){
-    box.removeChild(box.lastChild);
-  }
+ while(box.children.length>6){
+  box.removeChild(box.lastChild);
+ }
 }
 
 /* ===================================
@@ -509,67 +443,78 @@ function generateFeed(){
 =================================== */
 function initChart(){
 
-  const ctx = document.getElementById("profitChart");
-  if(!ctx) return;
+ const ctx=
+ document.getElementById("profitChart");
 
-  chart = new Chart(ctx,{
-    type:"line",
-    data:{
-      labels:[],
-      datasets:[{
-        data:[],
-        borderColor:"#007bff",
-        backgroundColor:"rgba(0,123,255,.12)",
-        fill:true,
-        tension:.4
-      }]
-    },
-    options:{
-      responsive:true,
-      plugins:{
-        legend:{display:false}
-      },
-      scales:{
-        x:{display:false},
-        y:{display:false}
-      }
-    }
-  });
+ if(!ctx) return;
+
+ chart=new Chart(ctx,{
+ type:"line",
+ data:{
+ labels:[],
+ datasets:[{
+ data:[],
+ borderColor:"#007dff",
+ backgroundColor:"rgba(0,125,255,.12)",
+ fill:true,
+ tension:.4
+ }]
+ },
+ options:{
+ responsive:true,
+ plugins:{
+ legend:{display:false}
+ },
+ scales:{
+ x:{display:false},
+ y:{display:false}
+ }
+ }
+ });
 }
 
 function updateChart(){
+ if(!chart) return;
 
-  if(!chart) return;
+ let total=0;
 
-  let total = 0;
+ investments.forEach(inv=>{
+ const now=Date.now();
+ const max=inv.endTime-inv.startTime;
 
-  investments.forEach(inv=>{
+ let progress=Math.min(
+ ((now-inv.startTime)/max)*100,
+ 100
+ );
 
-    const now = Date.now();
-    const ms = inv.endTime - inv.startTime;
+ if(progress<0) progress=0;
 
-    let progress =
-      Math.min(((now - inv.startTime)/ms)*100,100);
+ total +=
+ inv.profit*(progress/100);
+ });
 
-    if(progress < 0) progress = 0;
+ chart.data.labels.push("");
+ chart.data.datasets[0].data.push(total);
 
-    total += inv.profit * (progress/100);
-  });
+ if(chart.data.labels.length>12){
+ chart.data.labels.shift();
+ chart.data.datasets[0].data.shift();
+ }
 
-  chart.data.labels.push("");
-  chart.data.datasets[0].data.push(total);
-
-  if(chart.data.labels.length > 12){
-    chart.data.labels.shift();
-    chart.data.datasets[0].data.shift();
-  }
-
-  chart.update();
+ chart.update();
 }
 
 /* ===================================
-   LOOPS
+   AUTO LOOP
 =================================== */
-setInterval(updateUI,3000);
-setInterval(saveUserData,10000);
-setInterval(generateFeed,4000);
+setInterval(()=>{
+ updateUI();
+},3000);
+
+setInterval(()=>{
+ saveUser();
+},10000);
+
+setInterval(()=>{
+ feed();
+},4000);
