@@ -1,0 +1,331 @@
+<!-- FILE 3: public/admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>G-SAVE Admin Panel</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111111">
+<link rel="apple-touch-icon" href="images/admin-icon-192.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#0b1220;
+color:#fff;
+padding:16px;
+}
+
+/* HEADER */
+.topbar{
+background:linear-gradient(135deg,#111827,#1e293b);
+padding:18px;
+border-radius:18px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+box-shadow:0 10px 30px rgba(0,0,0,.35);
+margin-bottom:16px;
+}
+
+.brand{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.brand i{
+font-size:22px;
+color:#38bdf8;
+}
+
+.brand h1{
+font-size:18px;
+}
+
+.brand small{
+display:block;
+opacity:.75;
+font-size:12px;
+margin-top:2px;
+}
+
+.logout-btn{
+border:none;
+background:#ef4444;
+color:#fff;
+padding:10px 14px;
+border-radius:12px;
+font-weight:bold;
+cursor:pointer;
+}
+
+/* STATS */
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+gap:12px;
+margin-bottom:16px;
+}
+
+.card{
+background:#111827;
+border:1px solid rgba(255,255,255,.06);
+border-radius:18px;
+padding:16px;
+box-shadow:0 8px 25px rgba(0,0,0,.25);
+}
+
+.card h3{
+font-size:13px;
+opacity:.75;
+margin-bottom:8px;
+}
+
+.card h2{
+font-size:24px;
+}
+
+/* SEARCH */
+.toolbar{
+display:flex;
+gap:10px;
+margin-bottom:16px;
+flex-wrap:wrap;
+}
+
+.toolbar input{
+flex:1;
+min-width:220px;
+padding:14px;
+border:none;
+border-radius:12px;
+font-size:15px;
+background:#111827;
+color:#fff;
+outline:none;
+}
+
+.toolbar button{
+border:none;
+padding:14px 16px;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+color:#fff;
+}
+
+.blue{background:#2563eb;}
+.green{background:#16a34a;}
+.red{background:#dc2626;}
+.gray{background:#374151;}
+
+/* TABLE */
+.table-wrap{
+background:#111827;
+border-radius:18px;
+padding:12px;
+overflow:auto;
+box-shadow:0 8px 25px rgba(0,0,0,.25);
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+min-width:900px;
+}
+
+th,td{
+padding:14px;
+text-align:left;
+border-bottom:1px solid rgba(255,255,255,.06);
+font-size:14px;
+vertical-align:middle;
+}
+
+th{
+color:#60a5fa;
+font-size:13px;
+}
+
+.action-row{
+display:flex;
+gap:6px;
+flex-wrap:wrap;
+}
+
+.small-btn{
+border:none;
+padding:8px 10px;
+border-radius:10px;
+font-size:12px;
+font-weight:bold;
+cursor:pointer;
+color:#fff;
+}
+
+/* POPUP */
+.popup{
+position:fixed;
+top:18px;
+right:18px;
+background:#16a34a;
+padding:14px 18px;
+border-radius:12px;
+font-weight:bold;
+opacity:0;
+transform:translateY(-15px);
+transition:.25s;
+z-index:999;
+}
+
+.popup.show{
+opacity:1;
+transform:translateY(0);
+}
+
+/* EMPTY */
+.empty{
+padding:16px;
+opacity:.7;
+text-align:center;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+.topbar{
+flex-direction:column;
+align-items:flex-start;
+}
+
+.brand h1{
+font-size:16px;
+}
+
+.card h2{
+font-size:22px;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<!-- TOAST -->
+<div class="popup" id="popup">Success</div>
+
+<!-- HEADER -->
+<header class="topbar">
+
+<div class="brand">
+<i class="fa-solid fa-shield-halved"></i>
+
+<div>
+<h1>G-SAVE ADMIN</h1>
+<small>Manage users, deposits & withdrawals</small>
+</div>
+</div>
+
+<button class="logout-btn" onclick="logoutAdmin()">
+<i class="fa-solid fa-right-from-bracket"></i>
+ Logout
+</button>
+
+</header>
+
+<!-- STATS -->
+<section class="stats">
+
+<div class="card">
+<h3>Total Users</h3>
+<h2 id="totalUsers">0</h2>
+</div>
+
+<div class="card">
+<h3>Total Balances</h3>
+<h2 id="totalBalance">₱0</h2>
+</div>
+
+<div class="card">
+<h3>Total CYT</h3>
+<h2 id="totalCYT">0</h2>
+</div>
+
+<div class="card">
+<h3>Active Investors</h3>
+<h2 id="activeUsers">0</h2>
+</div>
+
+</section>
+
+<!-- TOOLBAR -->
+<section class="toolbar">
+
+<input
+type="text"
+id="searchEmail"
+placeholder="Search name or email..."
+>
+
+<button class="blue" onclick="searchUser()">
+<i class="fa-solid fa-magnifying-glass"></i>
+ Search
+</button>
+
+<button class="gray" onclick="loadUsers()">
+<i class="fa-solid fa-rotate"></i>
+ Refresh
+</button>
+
+</section>
+
+<!-- TABLE -->
+<section class="table-wrap">
+
+<table>
+
+<thead>
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Balance</th>
+<th>CYT</th>
+<th>Withdrawable</th>
+<th>Investments</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="userTable">
+
+<tr>
+<td colspan="7" class="empty">Loading users...</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</section>
+
+<!-- MAIN JS -->
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+</script>
+<script src="admin.js"></script>
+
+</body>
+</html>
