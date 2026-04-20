@@ -5,7 +5,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>G-SAVE Investment</title>
-
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#007dff">
+<link rel="apple-touch-icon" href="images/icon-192.png">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -221,6 +223,10 @@ Continue with Google
 <footer class="footer">
 © 2026 G-SAVE Investment. All rights reserved.
 </footer>
-
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+</script>
 </body>
 </html>
