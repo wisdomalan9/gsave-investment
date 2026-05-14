@@ -131,7 +131,7 @@ Receipt ID: ${id}
 Name: ${currentUser?.name || "User"}
 Email: ${currentUser?.email || ""}
 
-Amount: ₦${Number(data.amount).toLocaleString()}
+Amount: ₱${Number(data.amount || 0).toLocaleString()}
 Method: ${data.method || "N/A"}
 
 ${type === "withdrawal" ? `
@@ -304,7 +304,7 @@ function depositNext(){
     const method = document.getElementById("depositMethod").value;
 
     if(amount < 1000){
-      popup("Minimum ₦1,000","#dc2626");
+      popup("Minimum ₱1,000","#dc2626");
       return;
     }
 
