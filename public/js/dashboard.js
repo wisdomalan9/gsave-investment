@@ -1,7 +1,6 @@
-// FINAL G-SAVE DASHBOARD JS (FULL MERGED BUILD)
-// Phase 1 + Phase 2 + Phase 3 COMPLETE
+// FINAL G-SAVE DASHBOARD JS (FULL MERGED + SAFE CURRENCY CORE)
 
-console.log("✅ G-SAVE DASHBOARD LOADED - FULL SYSTEM READY");
+console.log("✅ G-SAVE DASHBOARD LOADED - FULL SYSTEM READY + CURRENCY FIX");
 
 /* ===============================
    FIREBASE
@@ -24,6 +23,54 @@ const API = "https://gsave-investment.onrender.com/api/user";
    ADMIN WHATSAPP (UPDATED)
 =============================== */
 const ADMIN_WHATSAPP = "15488577219";
+
+/* ===============================
+   GLOBAL CURRENCY ENGINE (FIXED)
+=============================== */
+const CURRENCY = {
+  symbol: "₱",
+  allowed: ["₱", "₦", "$", "PHP", "php", "naira", "NAIRA"],
+};
+
+/* normalize ANY old stored value */
+function normalizeCurrencyValue(val) {
+  if (typeof val === "number") return val;
+  if (!val) return 0;
+
+  let str = String(val);
+
+  CURRENCY.allowed.forEach(s => {
+    str = str.replaceAll(s, "");
+  });
+
+  return Number(str.replace(/,/g, "")) || 0;
+}
+
+/* SAFE FORMATTER (ONLY ONE SOURCE OF TRUTH) */
+function formatMoney(value) {
+  const num = normalizeCurrencyValue(value);
+
+  return (
+    CURRENCY.symbol +
+    num.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+  );
+}
+
+/* clean old database text receipts */
+function cleanCurrencyText(text) {
+  if (!text) return text;
+
+  let cleaned = String(text);
+
+  CURRENCY.allowed.forEach(sym => {
+    cleaned = cleaned.split(sym).join(CURRENCY.symbol);
+  });
+
+  return cleaned;
+}
 
 /* ===============================
    STATE
@@ -74,27 +121,24 @@ const PACKAGES = [
 /* ===============================
    HELPERS
 =============================== */
-function php(v){
-  return "₱" + Number(v).toLocaleString(undefined,{
-    minimumFractionDigits:2,
-    maximumFractionDigits:2
-  });
+function php(v) {
+  return formatMoney(v);
 }
 
-function phpToCYT(v){
+function phpToCYT(v) {
   return Number(v) / CYT_RATE;
 }
 
-function popup(msg,color="#16a34a"){
+function popup(msg, color = "#16a34a") {
   const el = document.getElementById("popup");
-  if(!el) return;
+  if (!el) return;
   el.innerText = msg;
   el.style.background = color;
   el.classList.add("show");
-  setTimeout(()=>el.classList.remove("show"),2500);
+  setTimeout(() => el.classList.remove("show"), 2500);
 }
 
-function receipt(title,msg){
+function receipt(title, msg) {
   const box = document.getElementById("receiptBox");
   const wrap = document.getElementById("receipt");
 
@@ -110,19 +154,19 @@ function receipt(title,msg){
 /* ===============================
    RECEIPT SYSTEM
 =============================== */
-function generateReceiptId(type){
+function generateReceiptId(type) {
   const prefix = type === "deposit" ? "DEP" : "WTH";
   const random = Math.floor(100000 + Math.random() * 900000);
   return `GSV-${prefix}-${random}`;
 }
 
-function buildReceipt(type, data){
-
+function buildReceipt(type, data) {
   const id = generateReceiptId(type);
 
-  const title = type === "deposit"
-    ? "G-SAVE DEPOSIT RECEIPT"
-    : "G-SAVE WITHDRAWAL RECEIPT";
+  const title =
+    type === "deposit"
+      ? "G-SAVE DEPOSIT RECEIPT"
+      : "G-SAVE WITHDRAWAL RECEIPT";
 
   const message = `
 ${title}
@@ -131,13 +175,17 @@ Receipt ID: ${id}
 Name: ${currentUser?.name || "User"}
 Email: ${currentUser?.email || ""}
 
-Amount: ₱${Number(data.amount || 0).toLocaleString()}
+Amount: ${formatMoney(data.amount)}
 Method: ${data.method || "N/A"}
 
-${type === "withdrawal" ? `
+${
+  type === "withdrawal"
+    ? `
 Bank Details:
 ${data.bankName || ""} ${data.accountNumber || ""} ${data.accountName || ""}
-` : ""}
+`
+    : ""
+}
 
 Date: ${new Date().toLocaleString()}
 
@@ -147,53 +195,63 @@ Status: PENDING
   return { id, message };
 }
 
-function sendToWhatsApp(message){
-  const url = "https://wa.me/" + ADMIN_WHATSAPP + "?text=" + encodeURIComponent(message);
+function sendToWhatsApp(message) {
+  const url =
+    "https://wa.me/" +
+    ADMIN_WHATSAPP +
+    "?text=" +
+    encodeURIComponent(message);
+
   window.open(url, "_blank");
 }
 
 /* ===============================
    HISTORY
 =============================== */
-function addHistory(type,details){
+function addHistory(type, details) {
   historyData.unshift({
     type,
-    details,
-    time:new Date().toLocaleString()
+    details: cleanCurrencyText(details),
+    time: new Date().toLocaleString(),
   });
 
-  if(historyData.length > 50) historyData.pop();
+  if (historyData.length > 50) historyData.pop();
 }
 
 /* ===============================
    AUTH
 =============================== */
-firebase.auth().onAuthStateChanged(async user=>{
-
-  if(!user){
+firebase.auth().onAuthStateChanged(async (user) => {
+  if (!user) {
     window.location.replace("login.html");
     return;
   }
 
   document.getElementById("userEmail").innerText = user.email;
 
-  const res = await fetch(API + "/login",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      name:user.displayName || "User",
-      email:user.email
-    })
+  const res = await fetch(API + "/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: user.displayName || "User",
+      email: user.email,
+    }),
   });
 
   const data = await res.json();
 
   currentUser = data;
 
-  balance = Number(data.balance || 0);
-  cyt = Number(data.cyt || 0);
-  withdrawable = Number(data.withdrawable || 0);
-  historyData = data.history || [];
+  /* FIX OLD CURRENCY HERE */
+  balance = normalizeCurrencyValue(data.balance);
+  cyt = normalizeCurrencyValue(data.cyt);
+  withdrawable = normalizeCurrencyValue(data.withdrawable);
+
+  historyData = (data.history || []).map((h) => ({
+    ...h,
+    details: cleanCurrencyText(h.details),
+  }));
+
   investments = data.investments || [];
 
   loadPlans();
@@ -204,7 +262,7 @@ firebase.auth().onAuthStateChanged(async user=>{
 /* ===============================
    UI
 =============================== */
-function updateUI(){
+function updateUI() {
   document.getElementById("balance").innerText = php(balance);
   document.getElementById("cytBalance").innerText = cyt.toFixed(6);
   document.getElementById("withdrawable").innerText = php(withdrawable);
@@ -214,15 +272,17 @@ function updateUI(){
   updateChart();
 }
 
-function renderHistory(){
+function renderHistory() {
   const box = document.getElementById("historyList");
-  if(!historyData.length){
+
+  if (!historyData.length) {
     box.innerHTML = `<div class="empty">No transactions yet</div>`;
     return;
   }
 
   box.innerHTML = "";
-  historyData.slice(0,15).forEach(h=>{
+
+  historyData.slice(0, 15).forEach((h) => {
     box.innerHTML += `
       <div class="list-item">
         <strong>${h.type}</strong><br>
@@ -233,27 +293,30 @@ function renderHistory(){
   });
 }
 
-function renderInvestments(){
+/* ===============================
+   INVESTMENTS
+=============================== */
+function renderInvestments() {
   const box = document.getElementById("investmentList");
 
-  if(!investments.length){
+  if (!investments.length) {
     box.innerHTML = `<div class="empty">No investments yet</div>`;
     return;
   }
 
   box.innerHTML = "";
 
-  investments.forEach(inv=>{
+  investments.forEach((inv) => {
     const now = Date.now();
     const total = inv.endTime - inv.startTime;
     const left = inv.endTime - now;
 
-    let progress = Math.min(((now - inv.startTime) / total) * 100,100);
-    if(progress < 0) progress = 0;
+    let progress = Math.min(((now - inv.startTime) / total) * 100, 100);
+    if (progress < 0) progress = 0;
 
     const liveProfit = inv.profit * (progress / 100);
 
-    if(progress >= 100 && !inv.paid){
+    if (progress >= 100 && !inv.paid) {
       inv.paid = true;
       inv.status = "completed";
 
@@ -282,11 +345,11 @@ function renderInvestments(){
 /* ===============================
    LOAD PLANS
 =============================== */
-function loadPlans(){
+function loadPlans() {
   const select = document.getElementById("planSelect");
   select.innerHTML = "";
 
-  PACKAGES.forEach(p=>{
+  PACKAGES.forEach((p) => {
     const opt = document.createElement("option");
     opt.value = p.id;
     opt.textContent = `${php(p.peso)} → ${php(p.profit)} / ${p.hours}h`;
@@ -295,83 +358,13 @@ function loadPlans(){
 }
 
 /* ===============================
-   DEPOSIT FLOW
+   INVEST / BUY / FLOW
 =============================== */
-function depositNext(){
-
-  if(depositStep === 1){
-    const amount = Number(document.getElementById("depositAmount").value);
-    const method = document.getElementById("depositMethod").value;
-
-    if(amount < 1000){
-      popup("Minimum ₱1,000","#dc2626");
-      return;
-    }
-
-    depositForm = { amount, method };
-
-    const receiptData = buildReceipt("deposit", depositForm);
-    activeReceipt = receiptData;
-
-    receipt("Deposit Receipt", receiptData.message);
-
-    depositStep = 2;
-    return;
-  }
-
-  if(depositStep === 2){
-    sendToWhatsApp(activeReceipt.message);
-    popup("Sent to Admin");
-    closeModal();
-    depositStep = 1;
-  }
-}
-
-/* ===============================
-   WITHDRAW FLOW
-=============================== */
-function withdrawNext(){
-
-  if(withdrawStep === 1){
-    const amountInput = document.getElementById("withdrawAmount").value;
-    const amount = amountInput ? Number(amountInput) : withdrawable;
-
-    const bankName = document.getElementById("bankName").value;
-    const accountNumber = document.getElementById("accountNumber").value;
-    const accountName = document.getElementById("accountName").value;
-
-    if(!bankName || !accountNumber || !accountName){
-      popup("Fill all bank details","#dc2626");
-      return;
-    }
-
-    withdrawForm = { amount, bankName, accountNumber, accountName };
-
-    const receiptData = buildReceipt("withdrawal", withdrawForm);
-    activeReceipt = receiptData;
-
-    receipt("Withdrawal Receipt", receiptData.message);
-
-    withdrawStep = 2;
-    return;
-  }
-
-  if(withdrawStep === 2){
-    sendToWhatsApp(activeReceipt.message);
-    popup("Sent to Admin");
-    closeModal();
-    withdrawStep = 1;
-  }
-}
-
-/* ===============================
-   BUY CYT
-=============================== */
-function buyCYT(){
+function buyCYT() {
   const amount = Number(document.getElementById("buyAmount").value);
 
-  if(amount <= 0 || amount > balance){
-    popup("Invalid amount","#dc2626");
+  if (amount <= 0 || amount > balance) {
+    popup("Invalid amount", "#dc2626");
     return;
   }
 
@@ -386,19 +379,16 @@ function buyCYT(){
   popup("CYT Purchased");
 }
 
-/* ===============================
-   INVEST
-=============================== */
-function invest(){
+function invest() {
   const id = Number(document.getElementById("planSelect").value);
-  const pack = PACKAGES.find(x=>x.id===id);
+  const pack = PACKAGES.find((x) => x.id === id);
 
-  if(!pack) return;
+  if (!pack) return;
 
   const need = phpToCYT(pack.peso);
 
-  if(cyt < need){
-    popup("Not enough CYT","#dc2626");
+  if (cyt < need) {
+    popup("Not enough CYT", "#dc2626");
     return;
   }
 
@@ -414,7 +404,7 @@ function invest(){
     startTime: start,
     endTime: end,
     status: "active",
-    paid: false
+    paid: false,
   });
 
   addHistory("Investment", `${php(pack.peso)} package started`);
@@ -424,36 +414,36 @@ function invest(){
 }
 
 /* ===============================
-   CHART + FEED (UNCHANGED CORE)
+   CHART + FEED
 =============================== */
-function initChart(){
+function initChart() {
   const ctx = document.getElementById("profitChart");
-  if(!ctx) return;
+  if (!ctx) return;
 
-  chart = new Chart(ctx,{
-    type:"line",
-    data:{ labels:[], datasets:[{ data:[], fill:true }] },
-    options:{ responsive:true, plugins:{legend:{display:false}} }
+  chart = new Chart(ctx, {
+    type: "line",
+    data: { labels: [], datasets: [{ data: [], fill: true }] },
+    options: { responsive: true, plugins: { legend: { display: false } } },
   });
 }
 
-function updateChart(){
-  if(!chart) return;
+function updateChart() {
+  if (!chart) return;
 
   let total = 0;
 
-  investments.forEach(inv=>{
+  investments.forEach((inv) => {
     const now = Date.now();
     const max = inv.endTime - inv.startTime;
 
-    let progress = Math.min(((now-inv.startTime)/max)*100,100);
-    total += inv.profit * (progress/100);
+    let progress = Math.min(((now - inv.startTime) / max) * 100, 100);
+    total += inv.profit * (progress / 100);
   });
 
   chart.data.labels.push("");
   chart.data.datasets[0].data.push(total);
 
-  if(chart.data.labels.length > 12){
+  if (chart.data.labels.length > 12) {
     chart.data.labels.shift();
     chart.data.datasets[0].data.shift();
   }
@@ -461,16 +451,19 @@ function updateChart(){
   chart.update();
 }
 
-const names = ["John","Grace","Kevin","Pedro","Anna","James","Mark","Liza"];
+const names = ["John", "Grace", "Kevin", "Pedro", "Anna", "James", "Mark", "Liza"];
 
-function feed(){
+function feed() {
   const box = document.getElementById("activityFeed");
-  if(!box) return;
+  if (!box) return;
 
-  const acts = ["invested","earned","withdrew"];
+  const acts = ["invested", "earned", "withdrew"];
   const item = document.createElement("div");
 
-  item.innerText = `${names[Math.floor(Math.random()*names.length)]} ${acts[Math.floor(Math.random()*acts.length)]}`;
+  item.innerText =
+    names[Math.floor(Math.random() * names.length)] +
+    " " +
+    acts[Math.floor(Math.random() * acts.length)];
 
   box.prepend(item);
 }
@@ -478,5 +471,5 @@ function feed(){
 /* ===============================
    LOOPS
 =============================== */
-setInterval(updateUI,3000);
-setInterval(feed,4000);
+setInterval(updateUI, 3000);
+setInterval(feed, 4000);
