@@ -469,6 +469,35 @@ function feed() {
 }
 
 /* ===============================
+   MODALS CONTROL (MISSING FIX)
+=============================== */
+
+function openDepositModal(){
+  const m = document.getElementById("depositModal");
+  if(m) m.classList.remove("hidden");
+}
+
+function openWithdrawModal(){
+  const m = document.getElementById("withdrawModal");
+  if(m) m.classList.remove("hidden");
+}
+
+function closeModal(){
+  const d = document.getElementById("depositModal");
+  const w = document.getElementById("withdrawModal");
+
+  if(d) d.classList.add("hidden");
+  if(w) w.classList.add("hidden");
+
+  depositStep = 1;
+  withdrawStep = 1;
+}
+
+function closeReceipt(){
+  const r = document.getElementById("receipt");
+  if(r) r.classList.add("hidden");
+}
+/* ===============================
    LOOPS
 =============================== */
 setInterval(updateUI, 3000);
