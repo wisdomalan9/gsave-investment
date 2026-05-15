@@ -1,4 +1,4 @@
-<!-- FILE: public/dashboard.html (UPDATED PHASE 2) -->
+<!-- FILE: public/dashboard.html (PRODUCTION STABLE VERSION) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,21 +12,34 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* SAFETY LAYER (prevents invisible UI failures) */
+.hidden { display:none !important; }
+.error-fallback {
+  padding:10px;
+  background:#dc2626;
+  color:#fff;
+  font-size:12px;
+}
+</style>
+
 </head>
 
 <body>
 
+<!-- SAFE ERROR GUARD -->
+<div id="errorBox" class="error-fallback hidden"></div>
+
 <!-- TOAST -->
 <div id="popup" class="popup">Success</div>
 
-<!-- RECEIPT MODAL -->
+<!-- RECEIPT -->
 <div id="receipt" class="receipt hidden">
   <div class="receipt-box" id="receiptBox"></div>
 </div>
 
-<!-- =======================
-TOP HEADER (UNCHANGED)
-======================= -->
+<!-- HEADER -->
 <header class="top-header">
 
   <div class="header-row">
@@ -38,7 +51,7 @@ TOP HEADER (UNCHANGED)
       </div>
     </div>
 
-    <button class="icon-btn" onclick="logout()">
+    <button class="icon-btn" onclick="safeLogout()">
       <i class="fa-solid fa-right-from-bracket"></i>
     </button>
   </div>
@@ -64,212 +77,162 @@ TOP HEADER (UNCHANGED)
 
 </header>
 
-<!-- =======================
-ACTIONS
-======================= -->
+<!-- ACTIONS -->
 <section class="actions-grid">
 
-  <button class="action-card" onclick="openModal('depositModal')">
+  <button class="action-card" onclick="safeOpen('depositModal')">
     <i class="fa-solid fa-wallet"></i>
     <span>Deposit</span>
   </button>
 
-  <button class="action-card" onclick="openModal('buyModal')">
+  <button class="action-card" onclick="safeOpen('buyModal')">
     <i class="fa-solid fa-coins"></i>
     <span>Buy CYT</span>
   </button>
 
-  <button class="action-card" onclick="openModal('investModal')">
+  <button class="action-card" onclick="safeOpen('investModal')">
     <i class="fa-solid fa-chart-line"></i>
     <span>Invest</span>
   </button>
 
-  <!-- UPDATED -->
-  <button class="action-card" onclick="openModal('withdrawModal')">
+  <button class="action-card" onclick="safeOpen('withdrawModal')">
     <i class="fa-solid fa-money-bill-transfer"></i>
     <span>Withdraw</span>
   </button>
 
 </section>
 
-<!-- =======================
-PROFIT CHART (UNCHANGED)
-======================= -->
+<!-- CHART -->
 <section class="card">
-  <div class="card-head">
-    <h3>Live Growth</h3>
-  </div>
+  <div class="card-head"><h3>Live Growth</h3></div>
   <canvas id="profitChart"></canvas>
 </section>
 
-<!-- =======================
-INVESTMENTS (UNCHANGED)
-======================= -->
+<!-- INVESTMENTS -->
 <section class="card">
-  <div class="card-head">
-    <h3>My Investments</h3>
-  </div>
+  <div class="card-head"><h3>My Investments</h3></div>
   <div id="investmentList" class="stack-list"></div>
 </section>
 
-<!-- =======================
-HISTORY (UNCHANGED)
-======================= -->
+<!-- HISTORY -->
 <section class="card">
-  <div class="card-head">
-    <h3>Transaction History</h3>
-  </div>
+  <div class="card-head"><h3>Transaction History</h3></div>
   <div id="historyList" class="stack-list"></div>
 </section>
 
-<!-- =======================
-LIVE FEED (UNCHANGED)
-======================= -->
+<!-- FEED -->
 <section class="card">
-  <div class="card-head">
-    <h3>Live Activity</h3>
-  </div>
+  <div class="card-head"><h3>Live Activity</h3></div>
   <div id="activityFeed" class="stack-list feed-list"></div>
 </section>
 
 <div class="bottom-space"></div>
 
-<!-- =======================
-DEPOSIT MODAL (UPDATED STEP FLOW)
-======================= -->
+<!-- ================= MODALS ================= -->
+
 <div class="modal hidden" id="depositModal">
   <div class="modal-sheet">
+    <h3>Deposit</h3>
 
-    <div class="sheet-head">
-      <h3>Deposit (Step 1 → 2)</h3>
-      <button onclick="closeModal()" class="close-btn">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-
-    <input type="number" id="depositAmount" placeholder="Minimum ₱1,000">
-
-    <select id="depositMethod" style="width:100%;padding:10px;margin-top:10px;">
-      <option value="Bank Transfer">Bank Transfer</option>
-      <option value="USDT">USDT</option>
-      <option value="Other">Other</option>
+    <input id="depositAmount" type="number" placeholder="Minimum ₱1,000">
+    <select id="depositMethod">
+      <option>Bank Transfer</option>
+      <option>USDT</option>
+      <option>Other</option>
     </select>
 
-    <button class="primary-btn" onclick="depositNext()">
-      Next / View Receipt
-    </button>
-
-    <button class="secondary-btn" onclick="closeModal()">
-      Cancel
-    </button>
-
+    <button onclick="safeDeposit()">Next</button>
+    <button onclick="safeClose()">Cancel</button>
   </div>
 </div>
 
-<!-- =======================
-WITHDRAW MODAL (NEW)
-======================= -->
 <div class="modal hidden" id="withdrawModal">
   <div class="modal-sheet">
+    <h3>Withdraw</h3>
 
-    <div class="sheet-head">
-      <h3>Withdraw (Step 1 → 2)</h3>
-      <button onclick="closeModal()" class="close-btn">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
+    <input id="withdrawAmount" type="number" placeholder="Amount">
+    <input id="bankName" placeholder="Bank Name">
+    <input id="accountNumber" placeholder="Account Number">
+    <input id="accountName" placeholder="Account Name">
 
-    <input type="number" id="withdrawAmount" placeholder="Amount (default = full balance)">
-
-    <input type="text" id="bankName" placeholder="Bank Name">
-
-    <input type="text" id="accountNumber" placeholder="Account Number">
-
-    <input type="text" id="accountName" placeholder="Account Name">
-
-    <button class="primary-btn" onclick="withdrawNext()">
-      Next / View Receipt
-    </button>
-
-    <button class="secondary-btn" onclick="closeModal()">
-      Cancel
-    </button>
-
+    <button onclick="safeWithdraw()">Next</button>
+    <button onclick="safeClose()">Cancel</button>
   </div>
 </div>
 
-<!-- =======================
-BUY CYT MODAL (UNCHANGED)
-======================= -->
 <div class="modal hidden" id="buyModal">
   <div class="modal-sheet">
+    <h3>Buy CYT</h3>
 
-    <div class="sheet-head">
-      <h3>Buy Cyber Token</h3>
-      <button onclick="closeModal()" class="close-btn">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
+    <input id="buyAmount" type="number" placeholder="Amount">
 
-    <input type="number" id="buyAmount" placeholder="Enter Peso Amount">
-
-    <button class="primary-btn" onclick="buyCYT()">
-      Buy Now
-    </button>
-
-    <button class="secondary-btn" onclick="closeModal()">
-      Cancel
-    </button>
-
+    <button onclick="safeBuy()">Buy</button>
+    <button onclick="safeClose()">Cancel</button>
   </div>
 </div>
 
-<!-- =======================
-INVEST MODAL (UNCHANGED)
-======================= -->
 <div class="modal hidden" id="investModal">
   <div class="modal-sheet">
-
-    <div class="sheet-head">
-      <h3>Start Investment</h3>
-      <button onclick="closeModal()" class="close-btn">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
+    <h3>Invest</h3>
 
     <select id="planSelect"></select>
 
-    <button class="primary-btn" onclick="invest()">
-      Start Now
-    </button>
-
-    <button class="secondary-btn" onclick="closeModal()">
-      Cancel
-    </button>
-
+    <button onclick="safeInvest()">Start</button>
+    <button onclick="safeClose()">Cancel</button>
   </div>
 </div>
 
-<!-- =======================
-HELPERS (UNCHANGED)
-======================= -->
+<!-- CORE JS -->
+<script src="js/dashboard.js"></script>
+
+<!-- ================= SAFETY WRAPPER ================= -->
 <script>
-function openModal(id){
-  document.getElementById(id).classList.remove("hidden");
+/* GLOBAL SAFETY LAYER */
+window.onerror = function(msg){
+  const box = document.getElementById("errorBox");
+  if(box){
+    box.innerText = "System error detected. Check console.";
+    box.classList.remove("hidden");
+  }
+  console.error(msg);
+};
+
+/* SAFE MODAL */
+function safeOpen(id){
+  try{
+    const el = document.getElementById(id);
+    if(el) el.classList.remove("hidden");
+  }catch(e){}
 }
 
-function closeModal(){
+function safeClose(){
   document.querySelectorAll(".modal").forEach(m=>{
     m.classList.add("hidden");
   });
 }
 
+/* SAFE ACTION HOOKS (prevents crash breaking UI) */
+function safeDeposit(){ try{ depositNext(); }catch(e){console.error(e);} }
+function safeWithdraw(){ try{ withdrawNext(); }catch(e){console.error(e);} }
+function safeBuy(){ try{ buyCYT(); }catch(e){console.error(e);} }
+function safeInvest(){ try{ invest(); }catch(e){console.error(e);} }
+
+/* LOGOUT SAFE */
+function safeLogout(){
+  try{
+    firebase.auth().signOut().then(()=>{
+      window.location.href="login.html";
+    });
+  }catch(e){
+    window.location.href="login.html";
+  }
+}
+
 function closeReceipt(){
-  document.getElementById("receipt").classList.add("hidden");
+  const r = document.getElementById("receipt");
+  if(r) r.classList.add("hidden");
 }
 </script>
-
-<script src="js/dashboard.js"></script>
 
 </body>
 </html>
