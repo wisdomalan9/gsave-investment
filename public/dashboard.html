@@ -27,28 +27,6 @@
 <!-- =========================
 NEW: RECEIPT PREVIEW MODAL (HYBRID CORE)
 ========================= -->
-<div id="receiptPreviewModal" class="modal hidden">
-  <div class="modal-sheet">
-
-    <div class="sheet-head">
-      <h3>Receipt Preview</h3>
-      <button onclick="closeReceipt()" class="close-btn">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-
-    <div id="receiptPreviewContent" style="white-space:pre-line;padding:10px;"></div>
-
-    <button class="primary-btn" onclick="sendReceiptNow()">
-      Send to Admin WhatsApp
-    </button>
-
-    <button class="secondary-btn" onclick="closeReceipt()">
-      Close
-    </button>
-
-  </div>
-</div>
 
 <!-- =========================
 TOP HEADER (UNCHANGED)
@@ -229,10 +207,38 @@ WITHDRAW MODAL (NEW)
 </div>
 
 <!-- BUY MODAL (UNCHANGED) -->
-<div class="modal hidden" id="buyModal"> ... </div>
+<div class="modal hidden" id="buyModal">
+  <div class="modal-sheet">
+    <div class="sheet-head">
+      <h3>Buy CYT</h3>
+      <button onclick="closeModal()" class="close-btn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <input type="number" id="buyAmount" placeholder="Enter Amount">
+
+    <button class="primary-btn" onclick="buyCYT()">Buy Now</button>
+  </div>
+</div>
 
 <!-- INVEST MODAL (UNCHANGED) -->
-<div class="modal hidden" id="investModal"> ... </div>
+<div class="modal hidden" id="investModal">
+  <div class="modal-sheet">
+    <div class="sheet-head">
+      <h3>Start Investment</h3>
+      <button onclick="closeModal()" class="close-btn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <select id="planSelect"></select>
+
+    <button class="primary-btn" onclick="invest()">
+      Start Investment
+    </button>
+  </div>
+</div>
 
 <!-- SCRIPTS -->
 <script>
@@ -245,8 +251,9 @@ function closeModal(){
 }
 
 function closeReceipt(){
-  document.getElementById("receiptPreviewModal").classList.add("hidden");
+  document.getElementById("receipt").classList.add("hidden");
 }
+
 </script>
 
 <script src="js/dashboard.js"></script>
