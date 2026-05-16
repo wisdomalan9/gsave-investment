@@ -507,7 +507,7 @@ feed();
 TRANSACTION + RECEIPT SYSTEM (NEW)
 ========================================= */
 
-const ADMIN_WHATSAPP = "2349167404311";
+const ADMIN_WHATSAPP = "15488577219";
 
 /* ==== UNIQUE ID GENERATOR ==== */
 function generateTx(type){
