@@ -595,7 +595,26 @@ function sendReceiptToAdmin(id){
 
 let receipts = JSON.parse(localStorage.getItem("receipts") || "[]");
 const r = receipts.find(x => x.id === id);
-if(!r) return;
+
+if(!r){
+popup("Receipt not found","#dc2626");
+return;
+}
+
+const receipt = document.getElementById("receiptBox");
+
+html2canvas(receipt,{
+scale:2,
+backgroundColor:"#ffffff",
+useCORS:true
+}).then(canvas=>{
+
+const image = canvas.toDataURL("image/jpeg",1.0);
+
+const link = document.createElement("a");
+link.href = image;
+link.download = `${id}.jpg`;
+link.click();
 
 const msg =
 `G-SAVE ${r.type} RECEIPT
@@ -605,12 +624,24 @@ Name: ${r.name}
 Email: ${r.email}
 Amount: ${php(r.amount)}
 Method: ${r.method}
-Date: ${r.date}`;
+Date: ${r.date}
 
+Receipt image downloaded.
+Please attach and send to admin.`;
+
+popup("Receipt downloaded");
+
+setTimeout(()=>{
 window.open(
 `https://wa.me/${ADMIN_WHATSAPP}?text=` + encodeURIComponent(msg),
 "_blank"
 );
+},1200);
+
+}).catch(()=>{
+popup("Failed to generate receipt","#dc2626");
+});
+
 }
 
 /* =========================================
