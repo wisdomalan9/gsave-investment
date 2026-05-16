@@ -10,6 +10,7 @@ const path = require("path");
 
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const User = require("./models/User");
 
 const app = express();
 
@@ -85,6 +86,18 @@ app.get("/admin", (req,res)=>{
   res.sendFile(
     path.join(__dirname,"public","admin.html")
   );
+});
+
+app.get("/check-users", async (req,res)=>{
+  try{
+    const users = await User.find({});
+    res.json(users);
+  }catch(err){
+    res.status(500).json({
+      success:false,
+      message:err.message
+    });
+  }
 });
 
 /* ===================================
