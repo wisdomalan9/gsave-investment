@@ -37,9 +37,9 @@ SETTINGS
 const CYT_RATE = 3000000;
 
 const PACKAGES = [
-{ id:1,peso:1000,profit:50000,hours:6 },
-{ id:2,peso:2000,profit:100500,hours:8 },
-{ id:3,peso:3000,profit:140000,hours:10 },
+{ id:1,peso:1000,profit:50000,hours:3 },
+{ id:2,peso:2000,profit:100500,hours:6 },
+{ id:3,peso:3000,profit:140000,hours:9 },
 { id:4,peso:4000,profit:210000,hours:12 },
 { id:5,peso:5000,profit:300000,hours:16 },
 { id:6,peso:6000,profit:370000,hours:18 },
@@ -529,23 +529,62 @@ const wrap = document.getElementById("receipt");
 const box  = document.getElementById("receiptBox");
 
 box.innerHTML = `
-<h2>${data.type} Receipt</h2>
+<div style="
+background:#fff;
+border-radius:20px;
+padding:24px;
+box-shadow:0 10px 30px rgba(0,0,0,.12);
+font-family:Arial,sans-serif;
+">
 
-<p><strong>ID:</strong> ${data.id}</p>
-<p><strong>Name:</strong> ${data.name}</p>
-<p><strong>Email:</strong> ${data.email}</p>
-<p><strong>Amount:</strong> ${php(data.amount)}</p>
-<p><strong>Method:</strong> ${data.method}</p>
-<p><strong>Date:</strong> ${data.date}</p>
+<div style="text-align:center;margin-bottom:20px;">
+  <h2 style="color:#007dff;margin:0;">G-SAVE</h2>
+  <small style="color:#666;">Official Transaction Receipt</small>
+</div>
 
-<br>
+<div style="
+background:#f8fafc;
+padding:15px;
+border-radius:14px;
+margin-bottom:18px;
+">
+  <strong style="font-size:18px;">${data.type}</strong><br>
+  <small>${data.date}</small>
+</div>
 
-<button class="primary-btn" onclick="sendReceiptToAdmin('${data.id}')">
-Send To Admin WhatsApp
+<div style="line-height:1.9;color:#111;">
+  <div><strong>Transaction ID:</strong> ${data.id}</div>
+  <div><strong>Name:</strong> ${data.name}</div>
+  <div><strong>Email:</strong> ${data.email}</div>
+  <div><strong>Amount:</strong> ${php(data.amount)}</div>
+  <div><strong>Method:</strong> ${data.method}</div>
+</div>
+
+<div style="
+margin:20px 0;
+padding:12px;
+background:#ecfeff;
+border-left:4px solid #007dff;
+border-radius:10px;
+font-size:14px;
+">
+Awaiting admin confirmation
+</div>
+
+<button class="primary-btn"
+onclick="sendReceiptToAdmin('${data.id}')"
+style="width:100%;margin-bottom:12px;">
+<i class="fa-brands fa-whatsapp"></i>
+ Send to Admin
 </button>
 
-<br><br>
-<button class="primary-btn" onclick="closeReceipt()">Close</button>
+<button class="secondary-btn"
+onclick="closeReceipt()"
+style="width:100%;">
+Close
+</button>
+
+</div>
 `;
 
 wrap.classList.remove("hidden");
