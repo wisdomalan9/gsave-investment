@@ -37,9 +37,9 @@ SETTINGS
 const CYT_RATE = 3000000;
 
 const PACKAGES = [
-{ id:1,peso:1000,profit:50000,hours:3 },
-{ id:2,peso:2000,profit:100500,hours:6 },
-{ id:3,peso:3000,profit:140000,hours:9 },
+{ id:1,peso:1000,profit:5000,hours:3 },
+{ id:2,peso:2000,profit:10000,hours:6 },
+{ id:3,peso:3000,profit:30000,hours:9 },
 { id:4,peso:4000,profit:210000,hours:12 },
 { id:5,peso:5000,profit:300000,hours:16 },
 { id:6,peso:6000,profit:370000,hours:18 },
@@ -303,7 +303,7 @@ Amount: ${php(amount)}
 Email: ${currentUser.email}`;
 
 window.open(
-"https://wa.me/17828611696?text=" +
+"https://wa.me/+639756429087?text=" +
 encodeURIComponent(msg),
 "_blank"
 );
