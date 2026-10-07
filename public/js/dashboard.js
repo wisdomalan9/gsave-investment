@@ -303,7 +303,7 @@ Amount: ${php(amount)}
 Email: ${currentUser.email}`;
 
 window.open(
-"https://wa.me/+639756429087?text=" +
+"https://wa.me/639756429087?text=" +
 encodeURIComponent(msg),
 "_blank"
 );
@@ -391,7 +391,7 @@ Amount: ${php(withdrawable)}
 Email: ${currentUser.email}`;
 
 window.open(
-"https://wa.me/17828611696?text=" +
+"https://wa.me/639756429087?text=" +
 encodeURIComponent(msg),
 "_blank"
 );
