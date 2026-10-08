@@ -1,7 +1,7 @@
 // FINAL dashboard.js BUGFREE
 // Firebase + Render + Premium Stable Build
 
-console.log("✅ BUGFREE DASHBOARD LOADED");
+console.log("✅ BUGFREE DASHBOARD LOADED — AUTO UPDATE TEST");
 
 /* ===============================
 FIREBASE
